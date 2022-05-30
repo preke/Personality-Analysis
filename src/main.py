@@ -17,7 +17,7 @@ from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaF
 parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
-args.device       = 2
+args.device       = 0
 args.SEED         = 42
 args.MAX_LEN      = 64
 args.MAX_NUM_UTTR = 20
@@ -27,10 +27,10 @@ args.epochs       = 10
 args.num_class    = 2
 args.drop_out     = 0.1
 args.test_size    = 0.15
-args.mode         = 'Context_Hierarchical'
+args.mode         = 'Uttr'
 args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_bert_batch64/'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
-args.result_name  = args.mode + 'roberta_result_batch64.txt' 
+args.result_name  = args.mode + '.txt' 
 
 
 
@@ -48,34 +48,34 @@ tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=Tru
 
 
 
-# personalities = ['A']
-# lr_list = [1e-4] ## 1e-4
-# epoch_list = [20]
+personalities = ['A']
+lr_list = [1e-4] ## 1e-4
+epoch_list = [20]
 
 
 
 
 
 
-personalities = ['A','A','A','A','A','A','A','A','A','A','A','A','A','A','A',
-                 'C','C','C','C','C','C','C','C','C','C','C','C','C','C','C',
-                 'E','E','E','E','E','E','E','E','E','E','E','E','E','E','E',
-                 'O','O','O','O','O','O','O','O','O','O','O','O','O','O','O',
-                 'N','N','N','N','N','N','N','N','N','N','N','N','N','N','N']
-lr_list = [1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4,
-    1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4,
-    1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4,
-    1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4,
-    1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4]
-epoch_list = [20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-        20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-        20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-        20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-        20,20,20,20,20,20,20,20,20,20,20,20,20,20,20]
+# personalities = ['A','A','A','A','A','A','A','A','A','A','A','A','A','A','A',
+#                  'C','C','C','C','C','C','C','C','C','C','C','C','C','C','C',
+#                  'E','E','E','E','E','E','E','E','E','E','E','E','E','E','E',
+#                  'O','O','O','O','O','O','O','O','O','O','O','O','O','O','O',
+#                  'N','N','N','N','N','N','N','N','N','N','N','N','N','N','N']
+# lr_list = [1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4,
+#     1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4,
+#     1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4,
+#     1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4,
+#     1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4]
+# epoch_list = [20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
+#         20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
+#         20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
+#         20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
+#         20,20,20,20,20,20,20,20,20,20,20,20,20,20,20]
 
 cnt = 0
 
-seeds = [13]#, 1, 41, 42, 123, 456, 321, 999, 1024, 2048]
+seeds = [42]#, 1, 41, 42, 123, 456, 321, 999, 1024, 2048]
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
@@ -96,12 +96,7 @@ with open(args.result_name, 'w') as f:
             torch.manual_seed(args.SEED)
             torch.cuda.manual_seed_all(args.SEED)
             train_dataloader, test_dataloader, train_length = load_data(df, args, tokenizer)
-            
-#             import time
-#             time.sleep(1000)
-            # torch.backends.cudnn.deterministic=True
-            # torch.backends.cudnn.benchmark = False
-            
+
             
             if args.mode == 'Ours':
                 model     = Baseline_2.from_pretrained('bert-base-uncased').cuda(args.device)
