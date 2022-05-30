@@ -26,7 +26,7 @@ args.adam_epsilon = 1e-8
 args.epochs       = 10
 args.num_class    = 2
 args.drop_out     = 0.1
-args.test_size    = 0.15
+args.test_size    = 0.1
 args.mode         = 'Uttr'
 args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_bert_batch64/'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
@@ -202,12 +202,11 @@ with open(args.result_name, 'w') as f:
                 model     = DialogVAD.from_pretrained(args.model_path).cuda(args.device)
                 # model     = DialogVAD_roberta.from_pretrained(args.model_path).cuda(args.device)
             else:
-                model = RobertaForSequenceClassification.from_pretrained(args.model_path, \
-                            num_labels=args.num_class).cuda(args.device)
+                # model = RobertaForSequenceClassification.from_pretrained(args.model_path, \
+                #             num_labels=args.num_class).cuda(args.device)
                 
-                
-                # model = BertForSequenceClassification.from_pretrained(args.model_path, \
-                #        num_labels=args.num_class).cuda(args.device)
+                model = BertForSequenceClassification.from_pretrained(args.model_path, \
+                       num_labels=args.num_class).cuda(args.device)
 
             test_acc = eval_model(model, args, test_dataloader)
             test_acc_all_seeds.append(test_acc)
