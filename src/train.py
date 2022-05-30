@@ -1,0 +1,384 @@
+import sklearn
+import pandas as pd
+import numpy as np
+
+from transformers import BertTokenizer, BertConfig, BertForSequenceClassification
+from transformers import AdamW, get_linear_schedule_with_warmup
+from sklearn.metrics import f1_score
+from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import accuracy_score, matthews_corrcoef
+from tqdm import tqdm, trange,tnrange, tqdm_notebook
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import random
+import traceback
+import os
+import shutil
+
+
+
+def train_model(model, args, train_dataloader, valid_dataloader, train_length):
+    num_warmup_steps   = int(0*train_length) # first 1 epoch for warm-up
+    num_training_steps = len(train_dataloader)*args.epochs
+    
+    for name, param in model.named_parameters():
+
+
+#         if name.startswith('roberta'):
+#             param.requires_grad = False
+#         else:
+#             print(name,param.size())
+#         if name.startswith('roberta.encoder.layer.11') or name.startswith('roberta.pooler'):
+#             param.requires_grad = True
+#             print(name, param.size())
+            
+        if name.startswith('bert'):
+            param.requires_grad = False
+        else:
+            print(name,param.size())
+        if name.startswith('bert.encoder.layer.11') or name.startswith('bert.pooler'):
+            param.requires_grad = True
+            print(name, param.size())    
+
+
+    
+    optimizer = AdamW(model.parameters(filter(lambda p: p.requires_grad, model.parameters())), lr=args.lr, eps=args.adam_epsilon, correct_bias=False)  # To reproduce BertAdam specific behavior set correct_bias=False
+    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_warmup_steps, num_training_steps=num_training_steps)  # PyTorch scheduler
+    
+    
+    train_loss_set = []
+    learning_rate  = []
+    model.zero_grad()
+    best_eval_acc = 0
+
+    for _ in tnrange(1, args.epochs+1, desc='Epoch'):
+        print("<" + "="*22 + F" Epoch {_} "+ "="*22 + ">")
+        # Calculate total loss for this epoch
+        batch_loss = 0
+
+        for step, batch in enumerate(train_dataloader):
+            
+            # Set our model to training mode (as opposed to evaluation mode)
+            model.train()
+            
+            # Add batch to GPU
+            batch = tuple(t.cuda(args.device) for t in batch)
+            # Unpack the inputs from our dataloader
+            if args.mode == 'Ours':
+                b_uttrs, b_uttr_mask, b_dialog_ids, b_dialog_mask, b_seg_embeddings, b_vad_scores, b_labels = batch
+                # forward(self, uttr, uttr_mask, dialog, dialog_mask, dialog_seg_embeddings)
+                print(b_uttrs)
+                print(b_uttr_mask)
+                print(b_dialog_ids)
+                print(b_dialog_mask)
+                print(b_seg_embeddings)
+                logits, logit_vad   = model(b_uttrs, b_uttr_mask, b_dialog_ids, b_dialog_mask, b_seg_embeddings)
+                loss_mse            = nn.MSELoss()
+                vad_loss            = loss_mse(logit_vad, b_vad_scores) 
+                loss_ce             = nn.CrossEntropyLoss()
+                classification_loss = loss_ce(logits, b_labels)
+                loss                = vad_loss + classification_loss
+
+            elif args.mode == 'Uttr_VAD_embedding':
+                b_uttr_vads, b_uttr_masks, b_labels = batch
+                logits  = model(b_uttr_vads, attention_mask=b_uttr_masks)
+                loss_ce = nn.CrossEntropyLoss()
+                loss    = loss_ce(logits, b_labels)
+
+            elif args.mode == 'Context_VAD_embedding':
+                b_sent_vads, b_sent_masks, b_seg_embeddings, b_labels = batch
+                logits  = model(b_sent_vads, attention_mask=b_sent_masks, segment_embeddings=b_seg_embeddings)
+                loss_ce = nn.CrossEntropyLoss()
+                loss    = loss_ce(logits, b_labels)
+                
+            elif args.mode == 'Context_VAD':
+                b_input_ids, b_input_mask, b_seg_embeddings, b_vad_scores, b_labels = batch
+                logits, logit_vad   = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask)
+                loss_mse            = nn.MSELoss()
+                vad_loss            = loss_mse(logit_vad, b_vad_scores) 
+                loss_ce             = nn.CrossEntropyLoss()
+                classification_loss = loss_ce(logits, b_labels)
+                loss                = vad_loss + classification_loss
+                
+            elif args.mode == 'Uttr_VAD':
+                b_input_ids, b_input_mask, b_vad_scores, b_labels = batch
+                logits, logit_vad   = model(b_input_ids, attention_mask=b_input_mask)
+                loss_mse            = nn.MSELoss()
+                vad_loss            = loss_mse(logit_vad, b_vad_scores)                  
+                loss_ce             = nn.CrossEntropyLoss()
+                classification_loss = loss_ce(logits, b_labels)
+                alpha = 1
+                loss                = alpha * vad_loss + (2 - alpha) * classification_loss
+            elif args.mode == 'Context' or args.mode == 'baseline_3.1':
+                b_input_ids, b_input_mask, b_vad_scores, b_labels = batch
+                b_seg_embeddings = b_vad_scores ## only in this case
+                outputs = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask, labels=b_labels)
+                loss    = outputs.loss
+                logits  = outputs.logits
+            elif args.mode == 'Context_Hierarchical':
+                b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
+                logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
+                
+                loss_mse            = nn.MSELoss()
+                vad_loss            = loss_mse(logit_vads, b_vad_scores)
+                
+                
+                loss_ce             = nn.CrossEntropyLoss()
+                classification_loss = loss_ce(logits, b_labels)
+                
+                
+                loss                = vad_loss + classification_loss
+
+
+            elif args.mode == 'Uttr':
+                b_input_ids, b_input_mask, b_labels = batch
+                outputs = model(b_input_ids, attention_mask=b_input_mask, labels=b_labels)
+                loss    = outputs.loss
+                logits  = outputs.logits
+            
+            # Backward pass
+            loss.backward()
+            
+            # Clip the norm of the gradients to 1.0
+            # Gradient clipping is not in AdamW anymore
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            optimizer.step()
+            scheduler.step()
+            optimizer.zero_grad()
+            
+            # Update tracking variables
+            batch_loss += loss.item()
+
+        # Calculate the average loss over the training data.
+        avg_train_loss = batch_loss / len(train_dataloader)
+
+          
+        train_loss_set.append(avg_train_loss)
+        print(F'\n\tAverage Training loss: {avg_train_loss}')
+          
+        # Validation
+        # Put model in evaluation mode to evaluate loss on the validation set
+        eval_acc = eval_model(model, args, valid_dataloader)
+        if eval_acc > best_eval_acc:
+                    best_eval_acc = eval_acc
+                    try:
+                        shutil.rmtree(args.model_path)
+                    except:
+                        print(traceback.print_exc())
+                        os.mkdir(args.model_path)
+
+                    try:
+                        model.save_pretrained(args.model_path)
+                        print('****** saved new model to ' + args.model_path + ' ******')
+                    except:
+                        print(traceback.print_exc())
+        else:
+            print('EVAL acc:', eval_acc, ' ', 'BEST_acc', best_eval_acc)
+            
+
+    return train_loss_set, best_eval_acc
+
+    
+    
+    
+
+def eval_model(model, args, valid_dataloader):
+    # Tracking variables 
+    eval_accuracy, eval_mcc_accuracy, nb_eval_steps = 0, 0, 0
+    
+    labels_list = np.array([])
+    pred_list = np.array([])
+
+    # Evaluate data for one epoch
+    for batch in valid_dataloader:
+        # Add batch to GPU
+        batch = tuple(t.cuda(args.device) for t in batch)
+
+        # Telling the model not to compute or store gradients, saving memory and speeding up validation
+        with torch.no_grad():
+            if args.mode == 'Ours':
+                b_uttrs, b_uttr_mask, b_dialog_ids, b_dialog_mask, b_seg_embeddings, b_vad_scores, b_labels = batch
+                # forward(self, uttr, uttr_mask, dialog, dialog_mask, token_type_ids)
+                logits, logit_vad   = model(b_uttrs, b_uttr_mask, b_dialog_ids, b_dialog_mask, b_seg_embeddings)
+                loss_mse            = nn.MSELoss()
+                vad_loss            = loss_mse(logit_vad, b_vad_scores) 
+                loss_ce             = nn.CrossEntropyLoss()
+                classification_loss = loss_ce(logits, b_labels)
+                loss                = vad_loss + classification_loss
+
+            elif args.mode == 'Uttr_VAD_embedding':
+                b_uttr_vads, b_uttr_masks, b_labels = batch
+                logits  = model(b_uttr_vads, attention_mask=b_uttr_masks)
+                loss_ce = nn.CrossEntropyLoss()
+                loss    = loss_ce(logits, b_labels)
+
+            elif args.mode == 'Context_VAD_embedding':
+                b_sent_vads, b_sent_masks, b_seg_embeddings, b_labels = batch
+                logits  = model(b_sent_vads, attention_mask=b_sent_masks, segment_embeddings=b_seg_embeddings)
+                loss_ce = nn.CrossEntropyLoss()
+                loss    = loss_ce(logits, b_labels)
+                
+            elif args.mode == 'Context_VAD':
+                b_input_ids, b_input_mask, b_seg_embeddings, b_vad_scores, b_labels = batch
+                logits, logit_vad   = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask)
+                loss_mse            = nn.MSELoss()
+                vad_loss            = loss_mse(logit_vad, b_vad_scores) 
+                loss_ce             = nn.CrossEntropyLoss()
+                classification_loss = loss_ce(logits, b_labels)
+                loss                = vad_loss + classification_loss
+            elif args.mode == 'Uttr_VAD':
+                b_input_ids, b_input_mask, b_vad_scores, b_labels = batch    
+                logits, logit_vad   = model(b_input_ids, attention_mask=b_input_mask)
+                loss_mse            = nn.MSELoss()
+                vad_loss            = loss_mse(logit_vad,b_vad_scores)                  
+                loss_ce             = nn.CrossEntropyLoss()
+                classification_loss = loss_ce(logits, b_labels)
+                loss                = vad_loss + classification_loss
+            elif args.mode == 'Context' or args.mode == 'baseline_3.1':
+                b_input_ids, b_input_mask, b_vad_scores, b_labels = batch    
+                b_seg_embeddings = b_vad_scores ## only in this case
+                outputs = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask, labels=b_labels)
+                loss    = outputs.loss
+                logits  = outputs.logits
+
+            elif args.mode == 'Context_Hierarchical':
+                b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
+                logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
+                
+                loss_mse            = nn.MSELoss()
+                vad_loss            = loss_mse(logit_vads, b_vad_scores)
+                
+                
+                loss_ce             = nn.CrossEntropyLoss()
+                classification_loss = loss_ce(logits, b_labels)
+                
+                loss                = classification_loss
+                
+               
+            elif args.mode == 'Uttr':
+                b_input_ids, b_input_mask, b_labels = batch
+                outputs = model(b_input_ids, attention_mask=b_input_mask, labels=b_labels)
+                logits  = outputs.logits
+                
+        # Move logits and labels to CPU
+        logits      = logits.to('cpu').numpy()
+        label_ids   = b_labels.to('cpu').numpy()
+        
+        pred_flat   = np.argmax(logits, axis=1).flatten()
+        labels_flat = label_ids.flatten()
+        
+        pred_list   = np.append(pred_list, pred_flat)
+        labels_list = np.append(labels_list, labels_flat)
+                
+        nb_eval_steps += 1
+
+    # print(classification_report(pred_list, labels_list, digits=4)
+    print(logits)
+    print(labels_list)
+    print(pred_list)
+    # return f1_score(labels_list, pred_list)
+    return accuracy_score(labels_list, pred_list)
+
+
+
+
+def train_model_again(model, args, train_dataloader, valid_dataloader, train_length, best_eval_acc):
+    num_warmup_steps   = int(0*train_length) # first 1 epoch for warm-up
+    num_training_steps = len(train_dataloader)*args.epochs
+    
+    
+    for name, param in model.named_parameters():
+
+        if name.startswith('roberta') or name.startswith('get_vad'):
+            param.requires_grad = False
+        else:
+            print(name,param.size())
+            
+#         if name.startswith('bert') or name.startswith('get_vad'):
+#             param.requires_grad = False
+#         else:
+#             print(name,param.size())
+    
+    
+    optimizer = AdamW(model.parameters(filter(lambda p: p.requires_grad, model.parameters())), lr=args.lr, eps=args.adam_epsilon, correct_bias=False)  # To reproduce BertAdam specific behavior set correct_bias=False
+    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_warmup_steps, num_training_steps=num_training_steps)  # PyTorch scheduler
+   
+    model.train()
+    train_loss_set = []
+    learning_rate  = []
+    model.zero_grad()
+
+    for _ in tnrange(1, args.epochs+1, desc='Epoch'):
+        print("<" + "="*22 + F" Epoch {_} "+ "="*22 + ">")
+        # Calculate total loss for this epoch
+        batch_loss = 0
+
+        for step, batch in enumerate(train_dataloader):
+            
+            # Set our model to training mode (as opposed to evaluation mode)
+            model.train()
+            
+            # Add batch to GPU
+            batch = tuple(t.cuda(args.device) for t in batch)
+            # Unpack the inputs from our dataloader
+            
+            if args.mode == 'Context_Hierarchical':
+                b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
+                logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
+                
+                loss_mse            = nn.MSELoss()
+                vad_loss            = loss_mse(logit_vads, b_vad_scores)
+                
+                
+                loss_ce             = nn.CrossEntropyLoss()
+                classification_loss = loss_ce(logits, b_labels)
+                
+                loss                = classification_loss
+
+            
+            # Backward pass
+
+            
+            loss.backward()
+            
+            # Clip the norm of the gradients to 1.0
+            # Gradient clipping is not in AdamW anymore
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            optimizer.step()
+            scheduler.step()
+            optimizer.zero_grad()
+            
+            # Update tracking variables
+            batch_loss += loss.item()
+
+        # Calculate the average loss over the training data.
+        avg_train_loss = batch_loss / len(train_dataloader)
+
+          
+        train_loss_set.append(avg_train_loss)
+        print(F'\n\tAverage Training loss: {avg_train_loss}')
+          
+        # Validation
+        # Put model in evaluation mode to evaluate loss on the validation set
+        model.eval()
+        eval_acc = eval_model(model, args, valid_dataloader)
+        if eval_acc > best_eval_acc:
+                    best_eval_acc = eval_acc
+                    try:
+                        shutil.rmtree(args.model_path)
+                    except:
+                        print(traceback.print_exc())
+                        os.mkdir(args.model_path)
+
+                    try:
+                        model.save_pretrained(args.model_path)
+                        print('****** saved new model to ' + args.model_path + ' ******')
+                    except:
+                        print(traceback.print_exc())
+        else:
+            print('EVAL ACC:', eval_acc, ' ', 'BEST_ACC', best_eval_acc)
+            
+
+    return train_loss_set
+
