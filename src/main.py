@@ -50,7 +50,7 @@ args.VAD_dict = VAD_dict
 
 
 personalities = ['A','C','E','O','N']
-epoch_list = [20]
+epoch_list = [3]
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
