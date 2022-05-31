@@ -265,9 +265,9 @@ def eval_model(model, args, valid_dataloader):
         nb_eval_steps += 1
 
     # print(classification_report(pred_list, labels_list, digits=4)
-    print(logits)
-    print(labels_list)
-    print(pred_list)
+    # print(logits)
+    # print(labels_list)
+    # print(pred_list)
     # return f1_score(labels_list, pred_list)
     return accuracy_score(labels_list, pred_list)
 
