@@ -18,6 +18,7 @@ parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
 args.device       = 0
+args.BASE         = 'BERT'
 args.SEED         = 42
 args.MAX_LEN      = 64
 args.MAX_NUM_UTTR = 20
@@ -28,9 +29,10 @@ args.num_class    = 2
 args.drop_out     = 0.1
 args.test_size    = 0.1
 args.mode         = 'Uttr'
-args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_bert_batch64/'
+args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE +'_batch64/'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
+
 
 
 
@@ -42,19 +44,16 @@ for r in VAD_Lexicons.iterrows():
     VAD_dict[r[1]['Word']] = [r[1]['Valence'], r[1]['Arousal'], r[1]['Dominance']]
 args.VAD_dict = VAD_dict
 
-# tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-
-
-
 
 personalities = ['A']
-# lr_list = [1e-5] ## 1e-4
-lr_list = [2e-4] ## 1e-4
 epoch_list = [20]
 
-
-
+if args.BASE == 'BERT':
+    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
+    lr_list = [1e-5]
+elif args.BASE == 'RoBERTa':
+    tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
+    lr_list = [2e-4]
 
 
 
@@ -107,11 +106,12 @@ with open(args.result_name, 'w') as f:
                 We use the pre-trained models to encode the utterance 
                 from the speakers for personality prediction through the classification head.
                 '''
-                # model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', \
-                #            num_labels=args.num_class).cuda(args.device)
-                
-                model = RobertaForSequenceClassification.from_pretrained('roberta-base', \
-                            num_labels=args.num_class).cuda(args.device)
+                if args.BASE == 'BERT':
+                    model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', \
+                               num_labels=args.num_class).cuda(args.device)
+                elif args.BASE == 'RoBERTa':
+                    model = RobertaForSequenceClassification.from_pretrained('roberta-base', \
+                                num_labels=args.num_class).cuda(args.device)
         
                
             elif args.mode == 'Uttr_VAD':
@@ -120,9 +120,11 @@ with open(args.result_name, 'w') as f:
                 a VAD regression task to supervised the model to 
                 extract the affective information through a multi-task learning scheme.
                 '''
-                model     = Baseline_1.from_pretrained('bert-base-uncased').cuda(args.device)
                 
-                # model     = Baseline_1_roberta.from_pretrained('roberta-base').cuda(args.device)
+                if args.BASE == 'BERT':
+                    model     = Baseline_1.from_pretrained('bert-base-uncased').cuda(args.device)
+                elif args.BASE == 'RoBERTa':
+                    model     = Baseline_1_roberta.from_pretrained('roberta-base').cuda(args.device)
 
             elif args.mode == 'Context':
                 '''
@@ -154,8 +156,10 @@ with open(args.result_name, 'w') as f:
                 We first use BERT to encode each utterance in the first layer (also incorporate with a VAD regression model), 
                 and then in the second layer we model the context...
                 '''
-                model     = DialogVAD.from_pretrained('bert-base-uncased').cuda(args.device)
-                # model     = DialogVAD_roberta.from_pretrained('roberta-base').cuda(args.device)
+                if args.BASE == 'BERT':
+                    model     = DialogVAD.from_pretrained('bert-base-uncased').cuda(args.device)
+                elif args.BASE == 'RoBERTa':
+                    model     = DialogVAD_roberta.from_pretrained('roberta-base').cuda(args.device)
                 
             elif args.mode == 'Context_VAD_embedding':
                 '''
@@ -187,27 +191,41 @@ with open(args.result_name, 'w') as f:
 
             if args.mode == 'Ours':
                 model     = Baseline_2.from_pretrained(args.model_path).cuda(args.device)
+            
             elif args.mode == 'Uttr_VAD_embedding':
                 model     = Uttr_VAD_embedding.from_pretrained(args.model_path).cuda(args.device)
+            
             elif args.mode == 'Context_VAD_embedding':
                 model     = Uttr_VAD_embedding.from_pretrained(args.model_path).cuda(args.device)
+            
             elif args.mode == 'Context_VAD':
                 model     = Baseline_1.from_pretrained(args.model_path).cuda(args.device)
+            
             elif args.mode == 'Uttr_VAD':
-                model     = Baseline_1.from_pretrained(args.model_path).cuda(args.device)
-                # model     = Baseline_1_roberta.from_pretrained(args.model_path).cuda(args.device)
+                if args.BASE == 'BERT':
+                    model     = Baseline_1.from_pretrained(args.model_path).cuda(args.device)
+                elif args.BASE == 'RoBERTa':
+                    model     = Baseline_1_roberta.from_pretrained(args.model_path).cuda(args.device)
+            
             elif args.mode == 'Context' or args.mode == 'baseline_3.1':
                 model = BertForSequenceClassification.from_pretrained(args.model_path, \
                        num_labels=args.num_class).cuda(args.device)
+            
             elif args.mode == 'Context_Hierarchical':
-                model     = DialogVAD.from_pretrained(args.model_path).cuda(args.device)
-                # model     = DialogVAD_roberta.from_pretrained(args.model_path).cuda(args.device)
+                if args.BASE == 'BERT':
+                    model     = DialogVAD.from_pretrained(args.model_path).cuda(args.device)
+                elif args.BASE == 'RoBERTa':
+                    model     = DialogVAD_roberta.from_pretrained(args.model_path).cuda(args.device)
+            
             else:
-                model = RobertaForSequenceClassification.from_pretrained(args.model_path, \
+                if args.BASE == 'BERT':
+                   model = BertForSequenceClassification.from_pretrained(args.model_path, \
+                       num_labels=args.num_class).cuda(args.device)
+                elif args.BASE == 'RoBERTa':
+                    model = RobertaForSequenceClassification.from_pretrained(args.model_path, \
                             num_labels=args.num_class).cuda(args.device)
                 
-                # model = BertForSequenceClassification.from_pretrained(args.model_path, \
-                #        num_labels=args.num_class).cuda(args.device)
+                
 
             print('Load model from', args.model_path)
             test_acc = eval_model(model, args, test_dataloader)
