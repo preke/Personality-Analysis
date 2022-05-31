@@ -42,14 +42,15 @@ for r in VAD_Lexicons.iterrows():
     VAD_dict[r[1]['Word']] = [r[1]['Valence'], r[1]['Arousal'], r[1]['Dominance']]
 args.VAD_dict = VAD_dict
 
-tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-# tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
+# tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
+tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
 
 
 
 
 personalities = ['A']
-lr_list = [1e-5] ## 1e-4
+# lr_list = [1e-5] ## 1e-4
+lr_list = [2e-4] ## 1e-4
 epoch_list = [20]
 
 
@@ -75,7 +76,7 @@ epoch_list = [20]
 
 cnt = 0
 
-seeds = [42]#, 1, 41, 42, 123, 456, 321, 999, 1024, 2048]
+seeds = [42]#[0, 1, 13, 41, 42, 123, 456, 321, 999, 1024, 2048]
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
@@ -106,11 +107,11 @@ with open(args.result_name, 'w') as f:
                 We use the pre-trained models to encode the utterance 
                 from the speakers for personality prediction through the classification head.
                 '''
-                model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', \
-                           num_labels=args.num_class).cuda(args.device)
+                # model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', \
+                #            num_labels=args.num_class).cuda(args.device)
                 
-#                 model = RobertaForSequenceClassification.from_pretrained('roberta-base', \
-#                             num_labels=args.num_class).cuda(args.device)
+                model = RobertaForSequenceClassification.from_pretrained('roberta-base', \
+                            num_labels=args.num_class).cuda(args.device)
         
                
             elif args.mode == 'Uttr_VAD':
@@ -202,11 +203,11 @@ with open(args.result_name, 'w') as f:
                 model     = DialogVAD.from_pretrained(args.model_path).cuda(args.device)
                 # model     = DialogVAD_roberta.from_pretrained(args.model_path).cuda(args.device)
             else:
-                # model = RobertaForSequenceClassification.from_pretrained(args.model_path, \
-                #             num_labels=args.num_class).cuda(args.device)
+                model = RobertaForSequenceClassification.from_pretrained(args.model_path, \
+                            num_labels=args.num_class).cuda(args.device)
                 
-                model = BertForSequenceClassification.from_pretrained(args.model_path, \
-                       num_labels=args.num_class).cuda(args.device)
+                # model = BertForSequenceClassification.from_pretrained(args.model_path, \
+                #        num_labels=args.num_class).cuda(args.device)
 
             print('Load model from', args.model_path)
             test_acc = eval_model(model, args, test_dataloader)
