@@ -52,7 +52,7 @@ for r in VAD_Lexicons.iterrows():
 args.VAD_dict = VAD_dict
 
 
-personalities = ['A']
+personalities = ['A','C','E','O','N']
 epoch_list = [20]
 
 if args.BASE == 'BERT':
@@ -82,7 +82,7 @@ elif args.BASE == 'RoBERTa':
 
 cnt = 0
 
-seeds = [42, 13]#[0, 1, 13, 41, 42, 123, 456, 321, 999, 1024, 2048]
+seeds = [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024]
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
