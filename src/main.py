@@ -33,7 +33,7 @@ args.test_size    = 0.1
 args.mode         = 'Uttr'
 args.BASE         = 'RoBERTa'
 
-args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE +'_batch64/'
+args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE +'_batch16/'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 
@@ -81,7 +81,7 @@ elif args.BASE == 'RoBERTa':
 
 cnt = 0
 
-seeds = [42] #[0, 1, 13, 41, 42, 123, 456, 321, 999, 1024]
+seeds = [1213] #[0, 1, 13, 41, 42, 123, 456, 321, 999, 1024]
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
