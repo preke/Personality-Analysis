@@ -150,6 +150,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
           
         # Validation
         # Put model in evaluation mode to evaluate loss on the validation set
+        model.eval()
         eval_acc = eval_model(model, args, valid_dataloader)
         if eval_acc > best_eval_acc:
                     best_eval_acc = eval_acc
