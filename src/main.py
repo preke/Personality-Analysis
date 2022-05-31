@@ -50,14 +50,16 @@ args.VAD_dict = VAD_dict
 
 
 personalities = ['A','C','E','O','N']
-epoch_list = [3]
+
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
+    epoch_list = [30]
     lr_list = [1e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    lr_list = [2e-4]
+    epoch_list = [10]
+    lr_list = [2e-5]
 
 
 
@@ -79,7 +81,7 @@ elif args.BASE == 'RoBERTa':
 
 cnt = 0
 
-seeds = [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024]
+seeds = [42] #[0, 1, 13, 41, 42, 123, 456, 321, 999, 1024]
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
