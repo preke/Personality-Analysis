@@ -102,7 +102,7 @@ with open(args.result_name, 'w') as f:
             np.random.seed(args.SEED)
             torch.manual_seed(args.SEED)
             torch.cuda.manual_seed_all(args.SEED)
-            train_dataloader, test_dataloader, train_length = load_data(df, args, tokenizer)
+            train_dataloader, valid_dataloader, test_dataloader, train_length = load_data(df, args, tokenizer)
 
             
             if args.mode == 'Ours':
@@ -178,7 +178,7 @@ with open(args.result_name, 'w') as f:
                 model     = Uttr_VAD_embedding.from_pretrained('bert-base-uncased').cuda(args.device)
 
 
-            training_loss,best_eval_acc = train_model(model, args, train_dataloader, test_dataloader, train_length)
+            training_loss,best_eval_acc = train_model(model, args, train_dataloader, valid_dataloader, train_length)
             
             
             # ===== 
