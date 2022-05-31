@@ -755,7 +755,7 @@ def load_data(df, args, tokenizer):
     
     
     elif args.mode == 'Uttr':
-        '''
+        
         uttrs = [tokenizer.encode(sent, add_special_tokens=True, max_length=args.MAX_LEN, \
                 pad_to_max_length=True) for sent in df['utterance']]
         uttr_masks = [[float(i>0) for i in seq] for seq in uttrs]
@@ -857,6 +857,7 @@ def load_data(df, args, tokenizer):
         
         train_length     = len(train_data)
         return train_dataloader, test_dataloader, train_length
+        '''
         
     else:
 
@@ -934,8 +935,6 @@ def load_data(df, args, tokenizer):
         train_labels        = torch.tensor(train_labels)    
         valid_labels        = torch.tensor(valid_labels)
         test_labels         = torch.tensor(test_labels)
-
-
 
         
         train_data       = TensorDataset(train_uttrs, train_uttr_masks, train_contexts, train_context_masks, \
