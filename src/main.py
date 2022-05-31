@@ -31,7 +31,7 @@ args.test_size    = 0.1
 
 
 args.mode         = 'Uttr'
-args.BASE         = 'RoBERTa'
+args.BASE         = 'BERT'
 
 
 
