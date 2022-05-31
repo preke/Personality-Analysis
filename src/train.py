@@ -49,7 +49,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
         batch_loss = 0
 
         for step, batch in enumerate(train_dataloader):
-            
+            print(step)
             # Set our model to training mode (as opposed to evaluation mode)
             model.train()
             

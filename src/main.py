@@ -49,7 +49,7 @@ for r in VAD_Lexicons.iterrows():
 args.VAD_dict = VAD_dict
 
 
-personalities = ['A','C','E','O','N']
+personalities = ['A']#,'C','E','O','N']
 
 
 if args.BASE == 'BERT':
