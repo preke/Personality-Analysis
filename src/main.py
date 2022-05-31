@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
 args.device       = 0
-args.BASE         = 'BERT'
+
 args.SEED         = 42
 args.MAX_LEN      = 64
 args.MAX_NUM_UTTR = 20
@@ -28,7 +28,14 @@ args.epochs       = 10
 args.num_class    = 2
 args.drop_out     = 0.1
 args.test_size    = 0.1
+
+
 args.mode         = 'Uttr'
+args.BASE         = 'RoBERTa'
+
+
+
+
 args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE +'_batch64/'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
