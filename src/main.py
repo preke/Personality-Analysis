@@ -82,7 +82,7 @@ elif args.BASE == 'RoBERTa':
 
 cnt = 0
 
-seeds = [42]#[0, 1, 13, 41, 42, 123, 456, 321, 999, 1024, 2048]
+seeds = [42, 13]#[0, 1, 13, 41, 42, 123, 456, 321, 999, 1024, 2048]
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
