@@ -361,8 +361,6 @@ def load_data(df, args, tokenizer):
         train_uttr_masks, valid_uttr_masks,_,_ = train_test_split(train_uttr_masks,train_set_labels,random_state=args.SEED, \
                                                        test_size=args.test_size,  stratify=train_set_labels)
 
-
-
         train_uttr_vads  = torch.tensor(train_uttr_vads)
         valid_uttr_vads  = torch.tensor(valid_uttr_vads)
         test_uttr_vads   = torch.tensor(test_uttr_vads)
