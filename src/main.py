@@ -49,7 +49,7 @@ tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=Tru
 
 
 personalities = ['A']
-lr_list = [1e-4] ## 1e-4
+lr_list = [1e-5] ## 1e-4
 epoch_list = [20]
 
 
