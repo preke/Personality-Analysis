@@ -30,8 +30,8 @@ args.drop_out     = 0.1
 args.test_size    = 0.1
 
 
-args.mode         = 'Context'
-args.BASE         = 'BERT'
+args.mode         = 'Uttr'
+args.BASE         = 'RoBERTa'
 
 args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE +'_batch64/'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
@@ -57,7 +57,7 @@ if args.BASE == 'BERT':
     lr_list = [1e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    lr_list = [1e-5]
+    lr_list = [2e-4]
 
 
 
