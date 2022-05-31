@@ -30,7 +30,7 @@ args.drop_out     = 0.1
 args.test_size    = 0.1
 
 
-args.mode         = 'Uttr'
+args.mode         = 'Context'
 args.BASE         = 'BERT'
 
 
