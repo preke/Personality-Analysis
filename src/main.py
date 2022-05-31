@@ -31,7 +31,7 @@ args.test_size    = 0.1
 
 
 args.mode         = 'Uttr'
-args.BASE         = 'BERT'
+args.BASE         = 'RoBERTa'
 
 args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE +'_batch64/'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
