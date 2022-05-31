@@ -208,6 +208,7 @@ with open(args.result_name, 'w') as f:
                 model = BertForSequenceClassification.from_pretrained(args.model_path, \
                        num_labels=args.num_class).cuda(args.device)
 
+            print('Load model from', args.model_path)
             test_acc = eval_model(model, args, test_dataloader)
             test_acc_all_seeds.append(test_acc)
             print('Current Seed is', seed)

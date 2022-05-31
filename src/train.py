@@ -59,11 +59,11 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
             if args.mode == 'Ours':
                 b_uttrs, b_uttr_mask, b_dialog_ids, b_dialog_mask, b_seg_embeddings, b_vad_scores, b_labels = batch
                 # forward(self, uttr, uttr_mask, dialog, dialog_mask, dialog_seg_embeddings)
-                print(b_uttrs)
-                print(b_uttr_mask)
-                print(b_dialog_ids)
-                print(b_dialog_mask)
-                print(b_seg_embeddings)
+                # print(b_uttrs)
+                # print(b_uttr_mask)
+                # print(b_dialog_ids)
+                # print(b_dialog_mask)
+                # print(b_seg_embeddings)
                 logits, logit_vad   = model(b_uttrs, b_uttr_mask, b_dialog_ids, b_dialog_mask, b_seg_embeddings)
                 loss_mse            = nn.MSELoss()
                 vad_loss            = loss_mse(logit_vad, b_vad_scores) 
@@ -158,7 +158,6 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
                     except:
                         print(traceback.print_exc())
                         os.mkdir(args.model_path)
-
                     try:
                         model.save_pretrained(args.model_path)
                         print('****** saved new model to ' + args.model_path + ' ******')
