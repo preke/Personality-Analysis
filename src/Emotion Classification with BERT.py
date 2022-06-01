@@ -19,7 +19,7 @@ from transformers import AdamW, get_linear_schedule_with_warmup
 
 MAX_LEN =256
 SEED = 0
-batch_size = 32
+batch_size = 16
 
 
 labels = df_Emotion['Emotion']
@@ -78,9 +78,9 @@ train_length = len(train_data)
 import numpy as np
 
 # Parameters:
-lr = 1e-5
+lr = 1e-6
 adam_epsilon = 1e-8
-epochs = 10
+epochs = 15
 
 num_warmup_steps = 0
 num_training_steps = len(train_dataloader)*epochs
