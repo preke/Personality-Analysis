@@ -30,18 +30,18 @@ labels       = label_enc
 
 
 # tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-# model     = RobertaForSequenceClassification.from_pretrained('roberta-base', num_labels=7).cuda(0)
+# model     = RobertaForSequenceClassification.from_pretrained('roberta-base', num_labels=7).cuda(1)
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 tokenizer = AutoTokenizer.from_pretrained("tae898/emoberta-base")
 
-model = AutoModelForSequenceClassification.from_pretrained("tae898/emoberta-base", num_labels=7).cuda(0)
+model = AutoModelForSequenceClassification.from_pretrained("tae898/emoberta-base", num_labels=7).cuda(1)
 
 
 # tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-# model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=7).cuda(0)
+# model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=7).cuda(1)
 
 input_ids = [tokenizer.encode(sent, add_special_tokens=True, max_length=MAX_LEN,pad_to_max_length=True) for sent in df_Emotion['Utterance']]
 
@@ -110,7 +110,7 @@ for _ in tnrange(1,epochs+1,desc='Epoch'):
         model.train()
         
         # Add batch to GPU
-        batch = tuple(t.cuda(0) for t in batch)
+        batch = tuple(t.cuda(1) for t in batch)
         # Unpack the inputs from our dataloader
         b_input_ids, b_input_mask, b_labels = batch
 
@@ -162,7 +162,7 @@ for _ in tnrange(1,epochs+1,desc='Epoch'):
     # Evaluate data for one epoch
     for batch in test_dataloader:
         # Add batch to GPU
-        batch = tuple(t.cuda(0) for t in batch)
+        batch = tuple(t.cuda(1) for t in batch)
         # Unpack the inputs from our dataloader
         b_input_ids, b_input_mask, b_labels = batch
         # Telling the model not to compute or store gradients, saving memory and speeding up validation
