@@ -31,7 +31,7 @@ args.test_size    = 0.1
 
 
 args.mode         = 'Uttr'
-args.BASE         = 'BERT'
+args.BASE         = 'EmoBERTa'
 
 args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE +'_batch16/'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
@@ -49,8 +49,10 @@ for r in VAD_Lexicons.iterrows():
 args.VAD_dict = VAD_dict
 
 
-personalities = ['A']#,'C','E','O','N']
+personalities = ['A','C','E','O','N']
 
+
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
@@ -60,6 +62,10 @@ elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [10]
     lr_list = [1e-6]
+elif args.BASE == 'EmoBERTa':
+    tokenizer = AutoTokenizer.from_pretrained("tae898/emoberta-base")
+    epoch_list = [10]
+    lr_list = [1e-4]
 
 
 
@@ -115,6 +121,8 @@ with open(args.result_name, 'w') as f:
                 elif args.BASE == 'RoBERTa':
                     model = RobertaForSequenceClassification.from_pretrained('roberta-base', \
                                 num_labels=args.num_class).cuda(args.device)
+                elif args.BASE == 'EmoBERTa':
+                    model = AutoModelForSequenceClassification.from_pretrained("tae898/emoberta-base", num_labels=args.num_class).cuda(args.device)
         
                
             elif args.mode == 'Uttr_VAD':
@@ -227,6 +235,8 @@ with open(args.result_name, 'w') as f:
                 elif args.BASE == 'RoBERTa':
                     model = RobertaForSequenceClassification.from_pretrained(args.model_path, \
                             num_labels=args.num_class).cuda(args.device)
+                elif args.BASE == 'EmoBERTa':
+                    model = AutoModelForSequenceClassification.from_pretrained(args.model_path, num_labels=args.num_class).cuda(args.device)
                 
                 
 
