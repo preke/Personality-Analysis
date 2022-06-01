@@ -1,5 +1,5 @@
 import pandas as pd
-df_peld = pd.read_csv('data/Dyadic_PELD.tsv', sep='\t')
+df_peld = pd.read_csv('../data/Dyadic_PELD.tsv', sep='\t')
 df_Emotion = pd.DataFrame([], columns=['Utterance', 'Emotion', 'Sentiment'])
 df_Emotion['Utterance'] = list(df_peld['Utterance_1']) + list(df_peld['Utterance_2']) + list(df_peld['Utterance_3'])
 df_Emotion['Emotion'] = list(df_peld['Emotion_1']) + list(df_peld['Emotion_2']) + list(df_peld['Emotion_3'])
