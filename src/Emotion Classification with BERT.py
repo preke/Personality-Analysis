@@ -72,7 +72,7 @@ import numpy as np
 # Parameters:
 lr = 1e-5
 adam_epsilon = 1e-8
-epochs = 3
+epochs = 10
 
 num_warmup_steps = 0
 num_training_steps = len(train_dataloader)*epochs
