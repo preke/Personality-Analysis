@@ -20,9 +20,9 @@ args   = parser.parse_args()
 args.device       = 1
 
 args.SEED         = 42
-args.MAX_LEN      = 128
+args.MAX_LEN      = 256
 args.MAX_NUM_UTTR = 20
-args.batch_size   = 16
+args.batch_size   = 32
 args.adam_epsilon = 1e-8
 args.epochs       = 3
 args.num_class    = 2
@@ -31,7 +31,7 @@ args.test_size    = 0.1
 
 
 args.mode         = 'Uttr'
-args.BASE         = 'RoBERTa'
+args.BASE         = 'BERT'
 
 args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE +'_batch16/'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
@@ -54,7 +54,7 @@ personalities = ['A']#,'C','E','O','N']
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-    epoch_list = [30]
+    epoch_list = [3]
     lr_list = [1e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
