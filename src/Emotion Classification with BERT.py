@@ -32,8 +32,16 @@ labels       = label_enc
 # tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
 # model     = RobertaForSequenceClassification.from_pretrained('roberta-base', num_labels=7).cuda(0)
 
-tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=7).cuda(0)
+
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+
+tokenizer = AutoTokenizer.from_pretrained("tae898/emoberta-base")
+
+model = AutoModelForSequenceClassification.from_pretrained("tae898/emoberta-base", num_labels=7).cuda(0)
+
+
+# tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
+# model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=7).cuda(0)
 
 input_ids = [tokenizer.encode(sent, add_special_tokens=True, max_length=MAX_LEN,pad_to_max_length=True) for sent in df_Emotion['Utterance']]
 
