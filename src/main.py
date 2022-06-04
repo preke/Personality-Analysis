@@ -20,8 +20,8 @@ args   = parser.parse_args()
 args.device       = 1
 
 args.SEED         = 42
-args.MAX_LEN      = 256
-args.MAX_NUM_UTTR = 20
+args.MAX_LEN      = 64
+args.MAX_NUM_UTTR = 30
 args.batch_size   = 32
 args.adam_epsilon = 1e-8
 args.epochs       = 3
@@ -30,7 +30,7 @@ args.drop_out     = 0.1
 args.test_size    = 0.1
 
 
-args.mode         = 'Uttr'
+args.mode         = 'Uttr' #'Context_Hierarchical'
 args.BASE         = 'BERT'
 
 args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE +'_batch16/'
@@ -55,17 +55,17 @@ personalities = ['A','C','E','O','N']
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 if args.BASE == 'BERT':
-    tokenizer = BertTokenizer.from_pretrained("bert-large-uncased", do_lower_case=True)
+    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
     epoch_list = [3]
     lr_list = [1e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [10]
     lr_list = [1e-6]
-elif args.BASE == 'EmoBERTa':
-    tokenizer = AutoTokenizer.from_pretrained("tae898/emoberta-base", do_lower_case=True)
-    epoch_list = [10]
-    lr_list = [1e-4]
+# elif args.BASE == 'EmoBERTa':
+#     tokenizer = AutoTokenizer.from_pretrained("tae898/emoberta-base", do_lower_case=True)
+#     epoch_list = [10]
+#     lr_list = [1e-4]
 
 
 
@@ -116,7 +116,7 @@ with open(args.result_name, 'w') as f:
                 from the speakers for personality prediction through the classification head.
                 '''
                 if args.BASE == 'BERT':
-                    model     = BertForSequenceClassification.from_pretrained('bert-large-uncased', \
+                    model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', \
                                num_labels=args.num_class).cuda(args.device)
                 elif args.BASE == 'RoBERTa':
                     model = RobertaForSequenceClassification.from_pretrained('roberta-base', \

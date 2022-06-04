@@ -79,10 +79,10 @@ def padding_uttrs(contexts, padding_element, args):
     
     for sents in contexts:
         pad_num = args.MAX_NUM_UTTR - len(sents) 
-        if pad_num > 0: # e.g. 20 - 15 
+        if pad_num > 0: # e.g. 25 - 15 
             for i in range(pad_num):
                 sents.append(padding_element)
-        elif pad_num < 0: # e.g. 20 - 36 
+        elif pad_num < 0: # e.g. 25 - 36 
             sents = sents[:args.MAX_NUM_UTTR]
         ans_contexts.append(sents)
 
