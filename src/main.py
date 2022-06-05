@@ -33,8 +33,6 @@ args.d_transformer = 32
 
 args.mode         = 'Context_Hierarchical'
 args.BASE         = 'BERT'
-
-args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE +'_batch16/'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 
@@ -67,6 +65,9 @@ elif args.BASE == 'RoBERTa':
 #     tokenizer = AutoTokenizer.from_pretrained("tae898/emoberta-base", do_lower_case=True)
 #     epoch_list = [10]
 #     lr_list = [1e-4]
+
+args.lr            = lr_list[0]
+args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ +'_' + '_batch16/'
 
 
 
