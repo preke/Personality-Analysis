@@ -744,8 +744,8 @@ def load_data(df, args, tokenizer):
         test_dataloader  = DataLoader(test_data, sampler=test_sampler, batch_size=args.batch_size)
         
         train_length     = len(train_data)
-        # return train_dataloader, valid_dataloader, test_dataloader, train_length
-        return train_dataloader, test_dataloader, train_length
+        return train_dataloader, valid_dataloader, test_dataloader, train_length
+        # return train_dataloader, test_dataloader, train_length
     
     
     elif args.mode == 'Uttr':
