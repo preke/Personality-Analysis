@@ -257,11 +257,14 @@ class Scaled_Dot_Product_Attention(nn.Module):
             self-attention后的张量，以及attention张量
         '''
         attention = torch.matmul(Q, K.permute(0, 2, 1))
-        attention = attention * scale
+        
         print(attention.shape)
         print(mask.shape)
 
-        attention = attention.masked_fill_(mask == 0, -1e9)
+        # attention = attention * scale
+        print(scale.shape)
+
+        attention = attention.masked_fill_(mask == -1, -1e9)
 
 
         # print(attention)
