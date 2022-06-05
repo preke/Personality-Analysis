@@ -207,7 +207,7 @@ class Context_Encoder(nn.Module):
         self.pad_size    = args.MAX_NUM_UTTR
         self.dropout     = args.drop_out
         self.num_head    = 1
-        self.dim_model   = args.d_transformer # 64
+        self.dim_model   = args.d_transformer # 32
         self.num_encoder = 1
         self.num_classes = args.num_class
         self.device      = args.device
@@ -224,11 +224,12 @@ class Context_Encoder(nn.Module):
         self.fc1 = nn.Linear(self.dim_model, self.num_classes)
         
     def forward(self, x, dialog_states, d_transformer, args):
-        out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * 64
+        out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * 32
         print(out.shape)
 
         out = self.position_embedding(out)
 
+        print(out.shape)
         ## add dialog state
         # out = self.dialog_state_embedding(out, dialog_states)
 
@@ -266,6 +267,7 @@ class Scaled_Dot_Product_Attention(nn.Module):
         # print(attention)
         # import time
         # time.sleep(100)
+
         attention = F.softmax(attention, dim=-1)
         context = torch.matmul(attention, V)
         return context
