@@ -225,11 +225,11 @@ class Context_Encoder(nn.Module):
         
     def forward(self, x, dialog_states, d_transformer, args):
         out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * 32
-        print(out.shape)
+        # print(out.shape)
 
         out = self.position_embedding(out)
 
-        print(out.shape)
+        # print(out.shape)
         ## add dialog state
         # out = self.dialog_state_embedding(out, dialog_states)
 
@@ -294,7 +294,7 @@ class Multi_Head_Attention(nn.Module):
         Q = Q.view(batch_size * self.num_head, -1, self.dim_head)
         K = K.view(batch_size * self.num_head, -1, self.dim_head)
         V = V.view(batch_size * self.num_head, -1, self.dim_head)
-        print(Q.shape, K.shape, V.shape)
+        # print(Q.shape, K.shape, V.shape)
         scale = K.size(-1) ** -0.5  # 缩放因子
         context = self.attention(Q, K, V, scale, dialog_states)
 
