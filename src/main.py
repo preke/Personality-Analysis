@@ -31,8 +31,8 @@ args.test_size     = 0.1
 args.d_transformer = 32
 
 
-args.mode         = 'Context_Hierarchical'
-args.BASE         = 'BERT'
+args.mode         = 'Uttr' ##'Context_Hierarchical'
+args.BASE         = 'RoBERTa'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 
@@ -59,7 +59,7 @@ if args.BASE == 'BERT':
     lr_list = [0.1]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [10]
+    epoch_list = [3]
     lr_list = [1e-6]
 # elif args.BASE == 'EmoBERTa':
 #     tokenizer = AutoTokenizer.from_pretrained("tae898/emoberta-base", do_lower_case=True)
