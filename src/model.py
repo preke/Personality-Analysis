@@ -353,7 +353,7 @@ class DialogVAD(BertPreTrainedModel):
         # ---- concat with transformer to do the self-attention
         logits = self.context_encoder(uttr_embedding, dialog_states, self.d_transformer, self.args) # [batch_size * 2]
 
-        return logits, logit_vads
+        return logits#, logit_vads
 
 
 

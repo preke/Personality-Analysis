@@ -108,17 +108,18 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
                 logits  = outputs.logits
             elif args.mode == 'Context_Hierarchical':
                 b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
-                logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
+                # logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
+                logits = model(b_contexts, b_context_masks, b_dialog_states)
                 
-                loss_mse            = nn.MSELoss()
-                vad_loss            = loss_mse(logit_vads, b_vad_scores)
+                # loss_mse            = nn.MSELoss()
+                # vad_loss            = loss_mse(logit_vads, b_vad_scores)
                 
                 
                 loss_ce             = nn.CrossEntropyLoss()
                 classification_loss = loss_ce(logits, b_labels)
                 
                 
-                loss                = vad_loss + classification_loss
+                loss                = classification_loss # vad_loss + 
 
 
             elif args.mode == 'Uttr':
@@ -238,10 +239,11 @@ def eval_model(model, args, valid_dataloader):
 
             elif args.mode == 'Context_Hierarchical':
                 b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
-                logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
+                # logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
+                logits = model(b_contexts, b_context_masks, b_dialog_states)
                 
-                loss_mse            = nn.MSELoss()
-                vad_loss            = loss_mse(logit_vads, b_vad_scores)
+                # loss_mse            = nn.MSELoss()
+                # vad_loss            = loss_mse(logit_vads, b_vad_scores)
                 
                 
                 loss_ce             = nn.CrossEntropyLoss()
