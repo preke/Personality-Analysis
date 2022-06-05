@@ -89,7 +89,7 @@ args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE
 
 cnt = 0
 
-seeds = [0]# [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024]
+seeds = [42]# [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024]
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
