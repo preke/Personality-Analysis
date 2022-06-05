@@ -342,6 +342,10 @@ class DialogVAD(BertPreTrainedModel):
         self.init_weights()
     
     def forward(self, context, utts_attn_mask, dialog_states):  
+        
+        print(context[0])
+        import time
+        time.sleep(100)
 
         batch_size, max_ctx_len, max_utt_len = context.size()
 
