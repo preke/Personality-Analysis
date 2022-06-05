@@ -18,8 +18,6 @@ parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
 args.device       = 0
-
-args.SEED          = 42
 args.MAX_LEN       = 128
 args.MAX_NUM_UTTR  = 20
 args.batch_size    = 16
@@ -55,7 +53,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-    epoch_list = [3]
+    epoch_list = [10]
     lr_list = [1e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
@@ -89,7 +87,7 @@ args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE
 
 cnt = 0
 
-seeds = [42]# [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024]
+seeds = [0]# [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024]
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
