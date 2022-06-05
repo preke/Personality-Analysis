@@ -355,8 +355,9 @@ class DialogVAD(BertPreTrainedModel):
 
         uttr_outputs = [uttr_output[1] for uttr_output in uttr_outputs] # 30 * 16 * 768 
 
-        uttr_embeddings = [self.reduce_size(uttr_output) for uttr_output in uttr_outputs] # 30 * 16 * 768 
-        uttr_embeddings = torch.autograd.Variable(torch.stack(uttr_embeddings).view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
+        uttr_embeddings = torch.stack([self.reduce_size(uttr_output) for uttr_output in uttr_outputs]) # 30 * 16 * 32
+        print(uttr_embeddings.shape)
+        uttr_embeddings = torch.autograd.Variable(uttr_embeddings.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
         # ## vad regression
         # # logit_vads      = self.get_vad(uttr_embedding).view(-1, 10, 3) # [batch_size * dialog_length * 3]
         
