@@ -30,7 +30,7 @@ args.d_transformer = 32
 
 
 args.mode         = 'Uttr' #'Context_Hierarchical'
-args.BASE         = 'BERT'
+args.BASE         = 'RoBERTa'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 
