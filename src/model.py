@@ -347,14 +347,14 @@ class DialogVAD(BertPreTrainedModel):
 
         batch_size, max_ctx_len, max_utt_len = context.size() # 16 * 30 * 32
 
-        context_utts = context.view(max_utt_len, batch_size, max_ctx_len)    # [batch_size * dialog_length * max_uttr_length]122
-        context_mask = context_mask.view(max_utt_len, batch_size, max_ctx_len)   
+        context_utts = context.view(max_ctx_len, batch_size, max_utt_len)    # [batch_size * dialog_length * max_uttr_length]122
+        context_mask = context_mask.view(max_ctx_len, batch_size, max_utt_len)   
 
         uttr_outputs  = [self.bert(uttr, uttr_mask) for uttr, uttr_mask in zip(context_utts,context_mask)]
         # 30 * 16 * 768 
 
         uttr_outputs = [uttr_output[1] for uttr_output in uttr_outputs] # 30 * 16 * 768 
-
+        print(len(uttr_outputs))
         uttr_embeddings = torch.stack([self.reduce_size(uttr_output) for uttr_output in uttr_outputs]) # 30 * 16 * 32
         print(uttr_embeddings.shape)
         uttr_embeddings = torch.autograd.Variable(uttr_embeddings.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
