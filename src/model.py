@@ -343,14 +343,18 @@ class DialogVAD(BertPreTrainedModel):
     
     def forward(self, context, context_mask, dialog_states):  
         
-        print(context_mask[0])
+        
+
+        batch_size, max_ctx_len, max_utt_len = context.size() # 32 * 30 * 32
+
+        utts = context.view(max_utt_len, *)    # [batch_size * dialog_length * max_uttr_length]122
+        utts_attn_mask = utts_attn_mask.view(max_utt_len, *)    
+
+        print(utts.shape)
         import time
         time.sleep(100)
 
-        batch_size, max_ctx_len, max_utt_len = context.size()
-
-        # utts = context.view(-1, max_utt_len)    # [batch_size * dialog_length * max_uttr_length]122
-        # utts_attn_mask = utts_attn_mask.view(-1, max_utt_len)    
+        # utts = 
         
         # uttr_outputs  = self.bert(utts, utts_attn_mask)
         # uttr_embedding = uttr_outputs[1] # [batch_size * dialog_length * 768]
@@ -364,7 +368,7 @@ class DialogVAD(BertPreTrainedModel):
         # # ---- concat with transformer to do the self-attention
         # logits = self.context_encoder(uttr_embedding, dialog_states, self.d_transformer, self.args) # [batch_size * 2]
 
-        return logits#, logit_vads
+        # return logits#, logit_vads
 
 
 
