@@ -258,16 +258,8 @@ class Scaled_Dot_Product_Attention(nn.Module):
         '''
         attention = torch.matmul(Q, K.permute(0, 2, 1))
         
-        print(attention.shape)
-        print(mask)
-        print(mask.shape)
-
         mask = mask.unsqueeze(-1).expand(-1, -1, attention.shape[1])
-        print(mask.shape)
-        print(mask)
         attention = attention * scale
-        print(scale.shape)
-
         attention = attention.masked_fill_(mask == -1, -1e9)
 
 
