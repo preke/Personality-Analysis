@@ -155,33 +155,33 @@ class Encoder(nn.Module):
         self.attention = Multi_Head_Attention(dim_model, num_head, dropout)
         self.feed_forward = Position_wise_Feed_Forward(dim_model, hidden, dropout)
 
-    def forward(self, x):
-        out = self.attention(x)
+    def forward(self, x, dialog_states):
+        out = self.attention(x, dialog_states)
         out = self.feed_forward(out)
         return out
 
 
-class Dialog_State_Encoding(nn.Module):
-    def __init__(self, embed, pad_size, dropout, device):
-        super(Dialog_State_Encoding, self).__init__()
-        self.device = device
+# class Dialog_State_Encoding(nn.Module):
+#     def __init__(self, embed, pad_size, dropout, device):
+#         super(Dialog_State_Encoding, self).__init__()
+#         self.device = device
         
-        # calculate the dialog state encoding
+#         # calculate the dialog state encoding
 
-        self.dim_model = embed # 32
-        self.pad_size = pad_size # 30
-        self.dropout = nn.Dropout(dropout)
-        self.seg_embedding  = nn.Linear(1, self.dim_model)
+#         self.dim_model = embed # 32
+#         self.pad_size = pad_size # 30
+#         self.dropout = nn.Dropout(dropout)
+#         self.seg_embedding  = nn.Linear(1, self.dim_model)
 
     
-    def forward(self, x, dialog_states):
-        dialog_states = dialog_states.view(-1,1).float() # (batch_size*pad_size)*1
-        state_emd = self.seg_embedding(dialog_states) # (batch_size*pad_size)* 32
-        state_emd = state_emd.view(-1,self.pad_size,self.dim_model) # batch_size * 30 * 32
+#     def forward(self, x, dialog_states):
+#         dialog_states = dialog_states.view(-1,1).float() # (batch_size*pad_size)*1
+#         state_emd = self.seg_embedding(dialog_states) # (batch_size*pad_size)* 32
+#         state_emd = state_emd.view(-1,self.pad_size,self.dim_model) # batch_size * 30 * 32
         
-        out = x + nn.Parameter(state_emd, requires_grad=False).to(self.device)
-        out = self.dropout(out)
-        return out
+#         out = x + nn.Parameter(state_emd, requires_grad=False).to(self.device)
+#         out = self.dropout(out)
+#         return out
 
 
 class Positional_Encoding(nn.Module):
@@ -229,10 +229,10 @@ class Context_Encoder(nn.Module):
         out = self.position_embedding(out)
 
         ## add dialog state
-        out = self.dialog_state_embedding(out, dialog_states)
+        # out = self.dialog_state_embedding(out, dialog_states)
 
         for encoder in self.encoders:
-            out = encoder(out)
+            out = encoder(out, dialog_states)
         # out = out.view(out.size(0), -1)
         out = torch.mean(out, 1)
         out = self.fc1(out)
@@ -244,7 +244,7 @@ class Scaled_Dot_Product_Attention(nn.Module):
     def __init__(self):
         super(Scaled_Dot_Product_Attention, self).__init__()
 
-    def forward(self, Q, K, V, scale=None):
+    def forward(self, Q, K, V, scale, mask):
         '''
         Args:
             Q: [batch_size, len_Q, dim_Q]
@@ -255,12 +255,11 @@ class Scaled_Dot_Product_Attention(nn.Module):
             self-attention后的张量，以及attention张量
         '''
         attention = torch.matmul(Q, K.permute(0, 2, 1))
-        if scale:
-            attention = attention * scale
-        # if mask:  # TODO change this
-        # print(attention)
-        # attention = attention.masked_fill_(mask == 0, -1e9)
-        # print('*'*10)
+        attention = attention * scale
+        print(attention.shape)
+        print(mask.shape)
+
+        attention = attention.masked_fill_(mask == 0, -1e9)
 
 
         # print(attention)
@@ -285,7 +284,7 @@ class Multi_Head_Attention(nn.Module):
         self.dropout = nn.Dropout(dropout)
         self.layer_norm = nn.LayerNorm(dim_model)
 
-    def forward(self, x):
+    def forward(self, x, dialog_states):
         batch_size = x.size(0)
         Q = self.fc_Q(x)
         K = self.fc_K(x)
@@ -293,10 +292,9 @@ class Multi_Head_Attention(nn.Module):
         Q = Q.view(batch_size * self.num_head, -1, self.dim_head)
         K = K.view(batch_size * self.num_head, -1, self.dim_head)
         V = V.view(batch_size * self.num_head, -1, self.dim_head)
-        # if mask:  # TODO
-        #     mask = mask.repeat(self.num_head, 1, 1)  # TODO change this
+        
         scale = K.size(-1) ** -0.5  # 缩放因子
-        context = self.attention(Q, K, V, scale)
+        context = self.attention(Q, K, V, scale, dialog_states)
 
         context = context.view(batch_size, -1, self.dim_head * self.num_head)
         out = self.fc(context)
@@ -354,9 +352,7 @@ class DialogVAD(BertPreTrainedModel):
         # 30 * 16 * 768 
 
         uttr_outputs = [uttr_output[1] for uttr_output in uttr_outputs] # 30 * 16 * 768 
-        print(len(uttr_outputs))
         uttr_embeddings = torch.stack([self.reduce_size(uttr_output) for uttr_output in uttr_outputs]) # 30 * 16 * 32
-        print(uttr_embeddings.shape)
         uttr_embeddings = torch.autograd.Variable(uttr_embeddings.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
         # ## vad regression
         # # logit_vads      = self.get_vad(uttr_embedding).view(-1, 10, 3) # [batch_size * dialog_length * 3]
