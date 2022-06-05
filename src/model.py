@@ -148,45 +148,6 @@ class Uttr_VAD_embedding_lookup(BertPreTrainedModel):
         return logit_p
     
     
-class Context_Encoder(nn.Module):
-    def __init__(self, config):
-        super(Context_Encoder, self).__init__()
-
-
-        self.pad_size    = 10
-        self.dropout     = 0.1
-        self.num_head    = 1
-        self.dim_model   = config.hidden_size
-        self.num_encoder = 1
-        self.num_classes = 2
-        self.device      = 2
-        self.hidden      = 512
-
-        self.position_embedding = Positional_Encoding(embed=config.hidden_size, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
-        self.dialog_state_embedding = Dialog_State_Encoding(embed=config.hidden_size, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
-        self.encoder = Encoder(dim_model=config.hidden_size, num_head=self.num_head, hidden=self.hidden, dropout=self.dropout)
-        self.encoders = nn.ModuleList([
-            copy.deepcopy(self.encoder)
-            for _ in range(self.num_encoder)]) # num_encoder
-
-        # self.fc1 = nn.Linear(self.pad_size * self.dim_model, self.num_classes)
-        self.fc1 = nn.Linear(self.dim_model, self.num_classes)
-        
-    def forward(self, x, dialog_states):
-        out = x.view(-1, self.pad_size, self.dim_model)
-        # print(out.shape)
-        out = self.position_embedding(out)
-
-        ## add dialog state
-        out = self.dialog_state_embedding(out, dialog_states)
-
-        for encoder in self.encoders:
-            out = encoder(out)
-        # out = out.view(out.size(0), -1)
-        out = torch.mean(out, 1)
-        out = self.fc1(out)
-        return out
-
 
 class Encoder(nn.Module):
     def __init__(self, dim_model, num_head, hidden, dropout):
@@ -207,22 +168,20 @@ class Dialog_State_Encoding(nn.Module):
         
         # calculate the dialog state encoding
 
+        self.dim_model = embed # 32
+        self.pad_size = pad_size # 30
         self.dropout = nn.Dropout(dropout)
-        self.seg_embedding  = nn.Linear(1, 768)
+        self.seg_embedding  = nn.Linear(1, self.dim_model)
 
     
     def forward(self, x, dialog_states):
-        dialog_states = dialog_states.view(-1,1).float()
-        # print(dialog_states.shape)
-        state_emd = self.seg_embedding(dialog_states)
-        state_emd = state_emd.view(-1,10,768)
-        # print(state_emd.shape)
-        
+        dialog_states = dialog_states.view(-1,1).float() # (batch_size*pad_size)*1
+        state_emd = self.seg_embedding(dialog_states) # (batch_size*pad_size)* 32
+        state_emd = state_emd.view(-1,self.pad_size,self.dim_model) # batch_size * 30 * 32
         
         out = x + nn.Parameter(state_emd, requires_grad=False).to(self.device)
         out = self.dropout(out)
         return out
-
 
 
 class Positional_Encoding(nn.Module):
@@ -237,6 +196,46 @@ class Positional_Encoding(nn.Module):
     def forward(self, x):
         out = x + nn.Parameter(self.pe, requires_grad=False).to(self.device)
         out = self.dropout(out)
+        return out
+
+
+class Context_Encoder(nn.Module):
+    def __init__(self, args):
+        super(Context_Encoder, self).__init__()
+
+        self.args        = args
+        self.pad_size    = args.MAX_NUM_UTTR
+        self.dropout     = args.drop_out
+        self.num_head    = 1
+        self.dim_model   = args.d_transformer # 64
+        self.num_encoder = 1
+        self.num_classes = args.num_class
+        self.device      = args.device
+        self.hidden      = 512
+
+        self.position_embedding = Positional_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
+        self.dialog_state_embedding = Dialog_State_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
+        self.encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden, dropout=self.dropout)
+        self.encoders = nn.ModuleList([
+            copy.deepcopy(self.encoder)
+            for _ in range(self.num_encoder)]) # num_encoder
+
+        # self.fc1 = nn.Linear(self.pad_size * self.dim_model, self.num_classes)
+        self.fc1 = nn.Linear(self.dim_model, self.num_classes)
+        
+    def forward(self, x, dialog_states, d_transformer, args):
+        out = x.view(-1, self.pad_size, self.d_transformer) # batch_size * context_len * 64
+
+        out = self.position_embedding(out)
+
+        ## add dialog state
+        out = self.dialog_state_embedding(out, dialog_states)
+
+        for encoder in self.encoders:
+            out = encoder(out)
+        # out = out.view(out.size(0), -1)
+        out = torch.mean(out, 1)
+        out = self.fc1(out)
         return out
 
 
@@ -318,49 +317,43 @@ class Position_wise_Feed_Forward(nn.Module):
         return out
 
 
-
-
 class DialogVAD(BertPreTrainedModel):
     
-    def __init__(self, config):
+    def __init__(self, config, args):
         super().__init__(config)
-        self.num_labels      = 2
+        self.args            = args
+        self.num_labels      = args.num_class
+        self.d_transformer   = args.d_transformer
         self.config          = config
         self.bert            = BertModel(config)
-        self.get_vad         = nn.Linear(config.hidden_size, 3)  # 3 for vad
-        
-        self.context_encoder = Context_Encoder(config)
-        self.personality_cls     = nn.Linear(config.hidden_size, 2) # binary classification
+        # self.get_vad         = nn.Linear(config.hidden_size, 3)  # 3 for vad
+        self.reduce_size     = nn.Linear(config.hidden_size, self.d_transformer) # from 768 reduce to 64 for the appended Transformer model
+
+
+        self.context_encoder = Context_Encoder(args)
+        # self.personality_cls     = nn.Linear(config.hidden_size, 2) # binary classification
         self.init_weights()
     
-    def forward(self, context, utts_attn_mask, dialog_states):  
-
-        '''
-        context: [batchsize * dialog_length * max_uttr_length]
-        dialog_states: [batchsize * dialog_length] indicate if the current utterance is from the analyzed speaker 
-        '''
+    def forward(self, context, utts_attn_mask, dialog_states, args):  
 
         batch_size, max_ctx_len, max_utt_len = context.size()
-        # print(batch_size, max_ctx_len, max_utt_len)
 
-
-        utts = context.view(-1, max_utt_len)    # [batch_size * dialog_length * max_uttr_length]
+        utts = context.view(-1, max_utt_len)    # [batch_size * dialog_length * max_uttr_length]122
         utts_attn_mask = utts_attn_mask.view(-1, max_utt_len)    
         
         uttr_outputs  = self.bert(utts, utts_attn_mask)
-        uttr_embedding = uttr_outputs[1]
-        # print(uttr_embedding.shape)
-        
-        ## vad regression
-        logit_vads      = self.get_vad(uttr_embedding).view(-1, 10, 3) # [batch_size * dialog_length * 3]
-        
+        uttr_embedding = uttr_outputs[1] # [batch_size * dialog_length * 768]
+        print(uttr_embedding.shape)
 
+        uttr_embedding = self.reduce_size(uttr_embedding)
+
+        ## vad regression
+        # logit_vads      = self.get_vad(uttr_embedding).view(-1, 10, 3) # [batch_size * dialog_length * 3]
+        
         # ---- concat with transformer to do the self-attention
-        logits = self.context_encoder(uttr_embedding, dialog_states) # [batch_size * 2]
-        # print(logit.size())
+        logits = self.context_encoder(uttr_embedding, dialog_states, self.d_transformer, self.args) # [batch_size * 2]
 
         return logits, logit_vads
-
 
 
 
