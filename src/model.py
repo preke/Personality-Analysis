@@ -257,8 +257,9 @@ class Scaled_Dot_Product_Attention(nn.Module):
         attention = torch.matmul(Q, K.permute(0, 2, 1))
         if scale:
             attention = attention * scale
-        # if mask:  # TODO change this
-        #     attention = attention.masked_fill_(mask == 0, -1e9)
+        if mask:  # TODO change this
+        
+        attention = attention.masked_fill_(mask == 0, -1e9)
         attention = F.softmax(attention, dim=-1)
         context = torch.matmul(attention, V)
         return context
