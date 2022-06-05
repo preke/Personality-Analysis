@@ -295,7 +295,7 @@ class Multi_Head_Attention(nn.Module):
         Q = Q.view(batch_size * self.num_head, -1, self.dim_head)
         K = K.view(batch_size * self.num_head, -1, self.dim_head)
         V = V.view(batch_size * self.num_head, -1, self.dim_head)
-        
+        print(Q.shape, K.shape, V.shape)
         scale = K.size(-1) ** -0.5  # 缩放因子
         context = self.attention(Q, K, V, scale, dialog_states)
 
