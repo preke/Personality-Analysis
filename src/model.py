@@ -350,15 +350,13 @@ class DialogVAD(BertPreTrainedModel):
         context_utts = context.view(max_utt_len, batch_size, max_ctx_len)    # [batch_size * dialog_length * max_uttr_length]122
         context_mask = context_mask.view(max_utt_len, batch_size, max_ctx_len)    
 
-        print(utts.shape)
-        import time
-        time.sleep(100)
+        
 
         # utts = 
         
         uttr_outputs  = [self.bert(uttr, uttr_mask) for uttr, uttr_mask in zip(context_utts,context_mask)]
 
-        print(uttr_outputs.shape)
+        print(uttr_outputs.shape) # 30 * 16 * 32 * 768 ??
         import time
         time.sleep(100)
         # uttr_embedding = uttr_outputs[1] # [batch_size * dialog_length * 768]
