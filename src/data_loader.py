@@ -13,9 +13,6 @@ import re
 
 # class Preprocessing:
 
-
-
-
 def get_vad(VAD_dict, sents, tokenizer):
     VAD_scores = []
     for sent in sents:
@@ -79,15 +76,14 @@ def padding_uttrs(contexts, padding_element, args):
     
     for sents in contexts:
         pad_num = args.MAX_NUM_UTTR - len(sents) 
-        if pad_num > 0: # e.g. 25 - 15 
+        if pad_num > 0: # e.g. 30 - 15 
             for i in range(pad_num):
                 sents.append(padding_element)
-        elif pad_num < 0: # e.g. 25 - 36 
+        elif pad_num < 0: # e.g. 30 - 36 
             sents = sents[:args.MAX_NUM_UTTR]
         ans_contexts.append(sents)
 
     return ans_contexts
-
 
 
 def load_data(df, args, tokenizer):
@@ -697,51 +693,51 @@ def load_data(df, args, tokenizer):
         train_dialog_states, test_dialog_states,_,_ = train_test_split(dialog_states, labels, random_state=args.SEED, \
                                                        test_size=args.test_size,  stratify=labels)
 
-#         train_set_labels = train_labels
+        train_set_labels = train_labels
 
 
-#         train_contexts, valid_contexts, train_labels, valid_labels = \
-#             train_test_split(train_contexts, train_set_labels, random_state=args.SEED, test_size=args.test_size, stratify=train_set_labels)
+        train_contexts, valid_contexts, train_labels, valid_labels = \
+            train_test_split(train_contexts, train_set_labels, random_state=args.SEED, test_size=args.test_size, stratify=train_set_labels)
         
-#         train_context_masks, valid_context_masks,_,_ = train_test_split(train_context_masks, train_set_labels,random_state=args.SEED, \
-#                                                        test_size=args.test_size,  stratify=train_set_labels)
+        train_context_masks, valid_context_masks,_,_ = train_test_split(train_context_masks, train_set_labels,random_state=args.SEED, \
+                                                       test_size=args.test_size,  stratify=train_set_labels)
 
-#         train_uttr_vads, valid_uttr_vads,_,_ = train_test_split(train_uttr_vads, train_set_labels, random_state=args.SEED, \
-#                                                        test_size=args.test_size,  stratify=train_set_labels)
+        train_uttr_vads, valid_uttr_vads,_,_ = train_test_split(train_uttr_vads, train_set_labels, random_state=args.SEED, \
+                                                       test_size=args.test_size,  stratify=train_set_labels)
 
-#         train_dialog_states, valid_dialog_states,_,_ = train_test_split(train_dialog_states, train_set_labels, random_state=args.SEED, \
-#                                                        test_size=args.test_size,  stratify=train_set_labels)
+        train_dialog_states, valid_dialog_states,_,_ = train_test_split(train_dialog_states, train_set_labels, random_state=args.SEED, \
+                                                       test_size=args.test_size,  stratify=train_set_labels)
         
         
         
 
         train_contexts      = torch.tensor(train_contexts) # [torch.tensor(i) for i in train_contexts]
-        # valid_contexts      = torch.tensor(valid_contexts) # [torch.tensor(i) for i in valid_contexts]
+        valid_contexts      = torch.tensor(valid_contexts) # [torch.tensor(i) for i in valid_contexts]
         test_contexts       = torch.tensor(test_contexts)  # [torch.tensor(i) for i in test_contexts]
 
         train_context_masks = torch.tensor(train_context_masks) # [torch.tensor(i) for i in train_context_masks]
-        # valid_context_masks = torch.tensor(valid_context_masks) # [torch.tensor(i) for i in valid_context_masks]
+        valid_context_masks = torch.tensor(valid_context_masks) # [torch.tensor(i) for i in valid_context_masks]
         test_context_masks  = torch.tensor(test_context_masks)  #[torch.tensor(i) for i in test_context_masks]
         
         train_uttr_vads      = torch.tensor(train_uttr_vads) # [torch.tensor(i) for i in train_uttr_vads]
-        # valid_uttr_vads      = torch.tensor(valid_uttr_vads) # [torch.tensor(i) for i in valid_uttr_vads]
+        valid_uttr_vads      = torch.tensor(valid_uttr_vads) # [torch.tensor(i) for i in valid_uttr_vads]
         test_uttr_vads       = torch.tensor(test_uttr_vads)  # [torch.tensor(i) for i in test_uttr_vads]
 
         train_dialog_states  = torch.tensor(train_dialog_states) # [torch.tensor(i) for i in train_dialog_states]
-        # valid_dialog_states  = torch.tensor(valid_dialog_states) # [torch.tensor(i) for i in valid_dialog_states]
+        valid_dialog_states  = torch.tensor(valid_dialog_states) # [torch.tensor(i) for i in valid_dialog_states]
         test_dialog_states   = torch.tensor(test_dialog_states)  # [torch.tensor(i) for i in test_dialog_states]
 
         train_labels        = torch.tensor(train_labels)    
-        # valid_labels        = torch.tensor(valid_labels)
+        valid_labels        = torch.tensor(valid_labels)
         test_labels         = torch.tensor(test_labels)
 
         train_data       = TensorDataset(train_contexts, train_context_masks, train_uttr_vads, train_dialog_states, train_labels)
         train_sampler    = RandomSampler(train_data)
         train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=args.batch_size)
         
-#         valid_data       = TensorDataset(valid_contexts, valid_context_masks, valid_uttr_vads, valid_dialog_states, valid_labels)
-#         valid_sampler    = RandomSampler(valid_data)
-#         valid_dataloader = DataLoader(valid_data, sampler=valid_sampler, batch_size=args.batch_size)
+        valid_data       = TensorDataset(valid_contexts, valid_context_masks, valid_uttr_vads, valid_dialog_states, valid_labels)
+        valid_sampler    = RandomSampler(valid_data)
+        valid_dataloader = DataLoader(valid_data, sampler=valid_sampler, batch_size=args.batch_size)
         
         test_data        = TensorDataset(test_contexts, test_context_masks, test_uttr_vads, test_dialog_states, test_labels)
         test_sampler     = RandomSampler(test_data)
