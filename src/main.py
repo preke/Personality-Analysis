@@ -20,8 +20,8 @@ args   = parser.parse_args()
 args.device       = 1
 
 args.SEED          = 42
-args.MAX_LEN       = 64
-args.MAX_NUM_UTTR  = 25
+args.MAX_LEN       = 32
+args.MAX_NUM_UTTR  = 30
 args.batch_size    = 16
 args.adam_epsilon  = 1e-8
 args.epochs        = 3
@@ -89,7 +89,7 @@ args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE
 
 cnt = 0
 
-seeds = [0]#, 1, 13, 41, 42, 123, 456, 321, 999, 1024]
+seeds = [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024]
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
