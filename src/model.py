@@ -262,7 +262,7 @@ class Scaled_Dot_Product_Attention(nn.Module):
         print(mask)
         print(mask.shape)
 
-        mask = mask.expand(mask.shape[0], attention.shape[1], attention.shape[1])
+        mask = mask.expand(-1, -1, attention.shape[1])
         print(mask.shape)
         print(mask)
         attention = attention * scale
