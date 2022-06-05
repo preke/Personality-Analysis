@@ -341,28 +341,28 @@ class DialogVAD(BertPreTrainedModel):
         # self.personality_cls     = nn.Linear(config.hidden_size, 2) # binary classification
         self.init_weights()
     
-    def forward(self, context, utts_attn_mask, dialog_states):  
+    def forward(self, context, context_mask, dialog_states):  
         
-        print(context[0])
+        print(context_mask[0])
         import time
         time.sleep(100)
 
         batch_size, max_ctx_len, max_utt_len = context.size()
 
-        utts = context.view(-1, max_utt_len)    # [batch_size * dialog_length * max_uttr_length]122
-        utts_attn_mask = utts_attn_mask.view(-1, max_utt_len)    
+        # utts = context.view(-1, max_utt_len)    # [batch_size * dialog_length * max_uttr_length]122
+        # utts_attn_mask = utts_attn_mask.view(-1, max_utt_len)    
         
-        uttr_outputs  = self.bert(utts, utts_attn_mask)
-        uttr_embedding = uttr_outputs[1] # [batch_size * dialog_length * 768]
-        # print(uttr_embedding.shape)
+        # uttr_outputs  = self.bert(utts, utts_attn_mask)
+        # uttr_embedding = uttr_outputs[1] # [batch_size * dialog_length * 768]
+        # # print(uttr_embedding.shape)
 
-        uttr_embedding = self.reduce_size(uttr_embedding)
+        # uttr_embedding = self.reduce_size(uttr_embedding)
 
-        ## vad regression
-        # logit_vads      = self.get_vad(uttr_embedding).view(-1, 10, 3) # [batch_size * dialog_length * 3]
+        # ## vad regression
+        # # logit_vads      = self.get_vad(uttr_embedding).view(-1, 10, 3) # [batch_size * dialog_length * 3]
         
-        # ---- concat with transformer to do the self-attention
-        logits = self.context_encoder(uttr_embedding, dialog_states, self.d_transformer, self.args) # [batch_size * 2]
+        # # ---- concat with transformer to do the self-attention
+        # logits = self.context_encoder(uttr_embedding, dialog_states, self.d_transformer, self.args) # [batch_size * 2]
 
         return logits#, logit_vads
 
