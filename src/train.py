@@ -147,7 +147,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
             if step%10 == 0:
                 model.eval()
                 eval_acc = eval_model(model, args, valid_dataloader)
-                if eval_acc >= best_eval_acc:
+                if eval_acc > best_eval_acc:
                             best_eval_acc = eval_acc
                             try:
                                 shutil.rmtree(args.model_path)
