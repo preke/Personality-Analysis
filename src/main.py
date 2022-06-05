@@ -21,14 +21,14 @@ args.device       = 0
 
 args.SEED          = 42
 args.MAX_LEN       = 64
-args.MAX_NUM_UTTR  = 20
+args.MAX_NUM_UTTR  = 40
 args.batch_size    = 16
 args.adam_epsilon  = 1e-8
 args.epochs        = 3
 args.num_class     = 2
 args.drop_out      = 0.1
 args.test_size     = 0.1
-args.d_transformer = 32
+args.d_transformer = 64
 
 
 args.mode         = 'Context_Hierarchical'
