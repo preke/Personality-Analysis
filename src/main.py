@@ -17,11 +17,11 @@ from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaF
 parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
-args.device       = 1
+args.device       = 0
 
 args.SEED          = 42
-args.MAX_LEN       = 32
-args.MAX_NUM_UTTR  = 30
+args.MAX_LEN       = 64
+args.MAX_NUM_UTTR  = 25
 args.batch_size    = 16
 args.adam_epsilon  = 1e-8
 args.epochs        = 3
