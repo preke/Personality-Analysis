@@ -664,7 +664,7 @@ def load_data(df, args, tokenizer):
 
         contexts       = [[tokenizer.encode(sent, add_special_tokens=True, max_length=args.MAX_LEN, pad_to_max_length=True) for sent in sents] for sents in dialog_context]
         context_masks  = [[[float(i>0) for i in seq] for seq in sents] for sents in contexts]
-        print(context_masks)
+        # print(context_masks)
         dialog_states  = [eval(i) for i in df['dialog_state']]
         labels         = list(df['labels'])
         uttr_vads      = [get_vad(args.VAD_dict, sent, tokenizer) for sent in contexts]

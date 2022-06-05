@@ -258,14 +258,14 @@ class Scaled_Dot_Product_Attention(nn.Module):
         if scale:
             attention = attention * scale
         # if mask:  # TODO change this
-        print(attention)
-        attention = attention.masked_fill_(mask == 0, -1e9)
-        print('*'*10)
+        # print(attention)
+        # attention = attention.masked_fill_(mask == 0, -1e9)
+        # print('*'*10)
 
 
-        print(attention)
-        import time
-        time.sleep(100)
+        # print(attention)
+        # import time
+        # time.sleep(100)
         attention = F.softmax(attention, dim=-1)
         context = torch.matmul(attention, V)
         return context
