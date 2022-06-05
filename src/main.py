@@ -226,7 +226,7 @@ with open(args.result_name, 'w') as f:
             
             elif args.mode == 'Context_Hierarchical':
                 if args.BASE == 'BERT':
-                    model     = DialogVAD.from_pretrained(args.model_path).cuda(args.device)
+                    model     = DialogVAD.from_pretrained(args.model_path, args=args).cuda(args.device)
                 elif args.BASE == 'RoBERTa':
                     model     = DialogVAD_roberta.from_pretrained(args.model_path).cuda(args.device)
             

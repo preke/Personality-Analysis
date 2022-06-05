@@ -224,7 +224,7 @@ class Context_Encoder(nn.Module):
         self.fc1 = nn.Linear(self.dim_model, self.num_classes)
         
     def forward(self, x, dialog_states, d_transformer, args):
-        out = x.view(-1, self.pad_size, self.d_transformer) # batch_size * context_len * 64
+        out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * 64
 
         out = self.position_embedding(out)
 
