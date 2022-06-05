@@ -22,15 +22,15 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
     num_warmup_steps   = int(0*train_length) # first 1 epoch for warm-up
     num_training_steps = len(train_dataloader)*args.epochs
     
-    # for name, param in model.named_parameters():
+    for name, param in model.named_parameters():
             
-    #     if name.startswith('bert'):
-    #         param.requires_grad = False
-    #     else:
-    #         print(name,param.size())
-    #     if name.startswith('bert.encoder.layer.11') or name.startswith('bert.pooler'):
-    #         param.requires_grad = True
-    #         print(name, param.size())    
+        if name.startswith('bert'):
+            param.requires_grad = False
+        else:
+            print(name,param.size())
+        if name.startswith('bert.encoder.layer.11') or name.startswith('bert.pooler'):
+            param.requires_grad = True
+            print(name, param.size())    
 
 
     
