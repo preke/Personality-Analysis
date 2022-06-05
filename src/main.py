@@ -170,7 +170,7 @@ with open(args.result_name, 'w') as f:
                 and then in the second layer we model the context...
                 '''
                 if args.BASE == 'BERT':
-                    model     = DialogVAD.from_pretrained('bert-base-uncased').cuda(args.device)
+                    model     = DialogVAD.from_pretrained('bert-base-uncased', args=args).cuda(args.device)
                 elif args.BASE == 'RoBERTa':
                     model     = DialogVAD_roberta.from_pretrained('roberta-base').cuda(args.device)
                 
