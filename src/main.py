@@ -21,7 +21,7 @@ args.device       = 0
 
 args.SEED          = 42
 args.MAX_LEN       = 64
-args.MAX_NUM_UTTR  = 30
+args.MAX_NUM_UTTR  = 20
 args.batch_size    = 16
 args.adam_epsilon  = 1e-8
 args.epochs        = 3
