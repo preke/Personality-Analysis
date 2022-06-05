@@ -57,8 +57,8 @@ if args.BASE == 'BERT':
     lr_list = [1e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [3]
-    lr_list = [1e-6]
+    epoch_list = [10]
+    lr_list = [1e-5]
 # elif args.BASE == 'EmoBERTa':
 #     tokenizer = AutoTokenizer.from_pretrained("tae898/emoberta-base", do_lower_case=True)
 #     epoch_list = [10]
