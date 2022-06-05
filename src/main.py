@@ -67,7 +67,7 @@ elif args.BASE == 'RoBERTa':
 #     lr_list = [1e-4]
 
 args.lr            = lr_list[0]
-args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ +'_' + '_batch16/'
+args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ str(args.lr ) +'_' + '_batch16/'
 
 
 
