@@ -17,7 +17,7 @@ from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaF
 parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
-args.device       = 1
+args.device       = 0
 
 args.SEED          = 42
 args.MAX_LEN       = 32
