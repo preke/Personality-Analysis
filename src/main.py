@@ -19,7 +19,7 @@ args   = parser.parse_args()
 
 args.device       = 0
 args.MAX_LEN       = 32
-args.MAX_NUM_UTTR  = 30
+args.MAX_NUM_UTTR  = 50
 args.batch_size    = 16
 args.adam_epsilon  = 1e-8
 # args.epochs        = 3
