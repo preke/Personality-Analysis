@@ -215,7 +215,7 @@ class Context_Encoder(nn.Module):
 
         # self.position_embedding = Positional_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
         # self.dialog_state_embedding = Dialog_State_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
-        self.encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden, dropout=self.dropout)
+        # self.encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden, dropout=self.dropout)
         # self.encoders = nn.ModuleList([
         #     copy.deepcopy(self.encoder)
         #     for _ in range(self.num_encoder)]) # num_encoder
@@ -236,7 +236,7 @@ class Context_Encoder(nn.Module):
         # for encoder in self.encoders:
         #     out = encoder(out, dialog_states)
         
-        out = self.encoder(out, dialog_states)    
+        # out = self.encoder(out, dialog_states)    
         # print(out.shape)
         out = torch.mean(out, 1)
         out = self.fc1(out)
