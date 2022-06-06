@@ -20,7 +20,7 @@ args   = parser.parse_args()
 args.device       = 0
 args.MAX_LEN       = 128
 args.MAX_NUM_UTTR  = 30
-args.batch_size    = 4
+args.batch_size    = 16
 args.adam_epsilon  = 1e-8
 # args.epochs        = 3
 args.num_class     = 2
@@ -54,7 +54,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
     epoch_list = [10]
-    lr_list = [1e-5]
+    lr_list = [0.005]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [10]
@@ -65,7 +65,7 @@ elif args.BASE == 'RoBERTa':
 #     lr_list = [1e-4]
 
 args.lr            = lr_list[0]
-args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ str(args.lr ) +'_' + '_batch16/'
+args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ str(args.lr ) +'_' + '_batch'+str(args.batch_size)+'/'
 
 
 
