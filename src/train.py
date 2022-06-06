@@ -28,9 +28,9 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
             param.requires_grad = False
         else:
             print(name,param.size())
-    #    if name.startswith('bert.encoder.layer.11') or name.startswith('bert.pooler'):
-    #         param.requires_grad = True
-    #         print(name, param.size())    
+       if name.startswith('bert.encoder.layer.11') or name.startswith('bert.pooler'):
+            param.requires_grad = True
+            print(name, param.size())    
 
 
     
