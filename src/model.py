@@ -153,11 +153,11 @@ class Encoder(nn.Module):
     def __init__(self, dim_model, num_head, hidden, dropout):
         super(Encoder, self).__init__()
         self.attention = Multi_Head_Attention(dim_model, num_head, dropout)
-        self.feed_forward = Position_wise_Feed_Forward(dim_model, hidden, dropout)
+        # self.feed_forward = Position_wise_Feed_Forward(dim_model, hidden, dropout)
 
     def forward(self, x, dialog_states):
         out = self.attention(x, dialog_states)
-        out = self.feed_forward(out)
+        # out = self.feed_forward(out)
         return out
 
 
@@ -237,7 +237,7 @@ class Context_Encoder(nn.Module):
         #     out = encoder(out, dialog_states)
         
         out = self.encoder(out, dialog_states)    
-        print(out.shape)
+        # print(out.shape)
         out = torch.mean(out, 1)
         out = self.fc1(out)
         return out
@@ -287,7 +287,7 @@ class Multi_Head_Attention(nn.Module):
         self.fc_K = nn.Linear(dim_model, num_head * self.dim_head)
         self.fc_V = nn.Linear(dim_model, num_head * self.dim_head)
         self.attention = Scaled_Dot_Product_Attention()
-        self.fc = nn.Linear(num_head * self.dim_head, dim_model)
+        # self.fc = nn.Linear(num_head * self.dim_head, dim_model)
         self.dropout = nn.Dropout(dropout)
         self.layer_norm = nn.LayerNorm(dim_model)
 
@@ -304,11 +304,12 @@ class Multi_Head_Attention(nn.Module):
         context = self.attention(Q, K, V, scale, dialog_states)
 
         context = context.view(batch_size, -1, self.dim_head * self.num_head)
-        out = self.fc(context)
-        out = self.dropout(out)
-        out = out + x  # 残差连接
-        out = self.layer_norm(out)
-        return out
+        return context
+        # out = self.fc(context)
+        # out = self.dropout(out)
+        # out = out + x  # 残差连接
+        # out = self.layer_norm(out)
+        # return out
 
 
 class Position_wise_Feed_Forward(nn.Module):
