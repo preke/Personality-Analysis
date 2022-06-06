@@ -29,7 +29,7 @@ args.test_size     = 0.1
 args.d_transformer = 32
 
 
-args.mode         = 'Uttr'#_Hierarchical'
+args.mode         = 'Context'#_Hierarchical'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
@@ -69,21 +69,6 @@ args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE
 
 
 
-# personalities = ['A','A','A','A','A','A','A','A','A','A','A','A','A','A','A',
-#                  'C','C','C','C','C','C','C','C','C','C','C','C','C','C','C',
-#                  'E','E','E','E','E','E','E','E','E','E','E','E','E','E','E',
-#                  'O','O','O','O','O','O','O','O','O','O','O','O','O','O','O',
-#                  'N','N','N','N','N','N','N','N','N','N','N','N','N','N','N']
-# lr_list = [1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4,
-#     1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4,
-#     1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4,
-#     1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4,
-#     1e-6,2e-6,3e-6,4e-6,5e-6,1e-5,2e-5,3e-5,4e-5,5e-5,1e-4,2e-4,3e-4,4e-4,5e-4]
-# epoch_list = [20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-#         20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-#         20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-#         20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-#         20,20,20,20,20,20,20,20,20,20,20,20,20,20,20]
 
 cnt = 0
 
