@@ -236,7 +236,7 @@ class Context_Encoder(nn.Module):
         # for encoder in self.encoders:
         #     out = encoder(out, dialog_states)
         
-        out = encoder(out, dialog_states)    
+        out = self.encoder(out, dialog_states)    
         print(out.shape)
         out = torch.mean(out, 1)
         out = self.fc1(out)
