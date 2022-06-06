@@ -19,7 +19,7 @@ args   = parser.parse_args()
 
 args.device       = 0
 args.MAX_LEN       = 32
-args.MAX_NUM_UTTR  = 50
+args.MAX_NUM_UTTR  = 30
 args.batch_size    = 16
 args.adam_epsilon  = 1e-8
 # args.epochs        = 3
@@ -46,7 +46,7 @@ for r in VAD_Lexicons.iterrows():
 args.VAD_dict = VAD_dict
 
 
-personalities = ['A'] #['A','C','E','O','N']
+personalities = ['A','C','E','O','N']
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -87,7 +87,7 @@ args.model_path   = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE
 
 cnt = 0
 
-seeds = [0]# [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024]
+seeds =  [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024]
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
