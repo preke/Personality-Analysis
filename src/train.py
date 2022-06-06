@@ -24,7 +24,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
     
     for name, param in model.named_parameters():
             
-        if name.startswith('bert'):
+        if not name.startswith('bert'):
             param.requires_grad = False
         else:
             print(name,param.size())
