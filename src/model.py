@@ -153,11 +153,11 @@ class Encoder(nn.Module):
     def __init__(self, dim_model, num_head, hidden, dropout):
         super(Encoder, self).__init__()
         self.attention = Multi_Head_Attention(dim_model, num_head, dropout)
-        # self.feed_forward = Position_wise_Feed_Forward(dim_model, hidden, dropout)
+        self.feed_forward = Position_wise_Feed_Forward(dim_model, hidden, dropout)
 
     def forward(self, x, dialog_states):
         out = self.attention(x, dialog_states)
-        # out = self.feed_forward(out)
+        out = self.feed_forward(out)
         return out
 
 
@@ -171,18 +171,10 @@ class Dialog_State_Encoding(nn.Module):
         self.dim_model = embed # 32
         self.pad_size = pad_size # 30
         self.dropout = nn.Dropout(dropout)
-        # self.seg_embedding  = nn.Linear(1, self.dim_model)
 
     
     def forward(self, x, dialog_states):
-        dialog_states = dialog_states.float().unsqueeze(-1).expand(-1,-1,self.dim_model)
-        print(x.shape)
-        print(dialog_states.shape)
-        import time
-        time.sleep(100)
-        # state_emd = self.seg_embedding(dialog_states) # (batch_size*pad_size)* 32
-        state_emd = state_emd.view(-1,self.pad_size,self.dim_model) # batch_size * 30 * 32
-        
+        dialog_states = dialog_states.float().unsqueeze(-1).expand(-1,-1,self.dim_model)        
         out = x + nn.Parameter(state_emd, requires_grad=False).to(self.device)
         out = self.dropout(out)
         return out
@@ -219,12 +211,11 @@ class Context_Encoder(nn.Module):
 
         self.position_embedding = Positional_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
         self.dialog_state_embedding = Dialog_State_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
-        # self.encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden, dropout=self.dropout)
+        self.encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden, dropout=self.dropout)
         # self.encoders = nn.ModuleList([
         #     copy.deepcopy(self.encoder)
         #     for _ in range(self.num_encoder)]) # num_encoder
 
-        # self.fc1 = nn.Linear(self.pad_size * self.dim_model, self.num_classes)
         self.fc1 = nn.Linear(self.dim_model, self.num_classes)
         
     def forward(self, x, dialog_states, d_transformer, args):
@@ -239,7 +230,7 @@ class Context_Encoder(nn.Module):
         # for encoder in self.encoders:
         #     out = encoder(out, dialog_states)
         
-        # out = self.encoder(out, dialog_states)    
+        out = self.encoder(out, dialog_states)    
         # print(out.shape)
         out = torch.mean(out, 1)
         out = self.fc1(out)
@@ -307,12 +298,11 @@ class Multi_Head_Attention(nn.Module):
         context = self.attention(Q, K, V, scale, dialog_states)
 
         context = context.view(batch_size, -1, self.dim_head * self.num_head)
-        return context
         # out = self.fc(context)
-        # out = self.dropout(out)
-        # out = out + x  # 残差连接
-        # out = self.layer_norm(out)
-        # return out
+        out = self.dropout(out)
+        out = out + x  # 残差连接
+        out = self.layer_norm(out)
+        return out
 
 
 class Position_wise_Feed_Forward(nn.Module):
