@@ -178,6 +178,8 @@ class Dialog_State_Encoding(nn.Module):
         dialog_states = dialog_states.view(-1,1).float() # (batch_size*pad_size)*1
         dialog_states = dialog_states.unsqueeze(-1).expand(-1,-1,self.dim_model)
         print(dialog_states.shape)
+        import time
+        time.sleep(100)
         # state_emd = self.seg_embedding(dialog_states) # (batch_size*pad_size)* 32
         state_emd = state_emd.view(-1,self.pad_size,self.dim_model) # batch_size * 30 * 32
         
