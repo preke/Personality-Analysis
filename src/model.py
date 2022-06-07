@@ -176,7 +176,9 @@ class Dialog_State_Encoding(nn.Module):
     
     def forward(self, x, dialog_states):
         dialog_states = dialog_states.view(-1,1).float() # (batch_size*pad_size)*1
+        print(dialog_states.shape)
         dialog_states = dialog_states.unsqueeze(-1).expand(-1,-1,self.dim_model)
+        print(x.shape)
         print(dialog_states.shape)
         import time
         time.sleep(100)
