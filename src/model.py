@@ -175,7 +175,7 @@ class Dialog_State_Encoding(nn.Module):
     
     def forward(self, x, dialog_states):
         dialog_states = dialog_states.float().unsqueeze(-1).expand(-1,-1,self.dim_model)        
-        out = x + nn.Parameter(state_emd, requires_grad=False).to(self.device)
+        out = x + nn.Parameter(dialog_states, requires_grad=False).to(self.device)
         out = self.dropout(out)
         return out
 
@@ -256,7 +256,6 @@ class Scaled_Dot_Product_Attention(nn.Module):
         
         mask = mask.unsqueeze(-1).expand(-1, -1, attention.shape[1])
         mask = mask + 1
-        # print(mask)
         attention = attention * scale
         attention = attention.masked_fill_(mask == 0, -1e9)
         # attention = attention.masked_fill_(mask == 1, -1e9)
