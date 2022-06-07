@@ -29,8 +29,8 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
             param.requires_grad = False
             print(name,param.size())
     
-    import time
-    time.sleep(100)
+    # import time
+    # time.sleep(100)
     
     optimizer = AdamW(model.parameters(), lr=args.lr, eps=args.adam_epsilon, correct_bias=False)  # To reproduce BertAdam specific behavior set correct_bias=False
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_warmup_steps, num_training_steps=num_training_steps)  # PyTorch scheduler
