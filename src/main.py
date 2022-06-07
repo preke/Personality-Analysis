@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
 args.device       = 0
-args.MAX_LEN       = 256
+args.MAX_LEN       = 128
 args.MAX_NUM_UTTR  = 20
 args.batch_size    = 32
 args.adam_epsilon  = 1e-8
