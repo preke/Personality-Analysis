@@ -161,27 +161,29 @@ class Encoder(nn.Module):
         return out
 
 
-# class Dialog_State_Encoding(nn.Module):
-#     def __init__(self, embed, pad_size, dropout, device):
-#         super(Dialog_State_Encoding, self).__init__()
-#         self.device = device
+class Dialog_State_Encoding(nn.Module):
+    def __init__(self, embed, pad_size, dropout, device):
+        super(Dialog_State_Encoding, self).__init__()
+        self.device = device
         
-#         # calculate the dialog state encoding
+        # calculate the dialog state encoding
 
-#         self.dim_model = embed # 32
-#         self.pad_size = pad_size # 30
-#         self.dropout = nn.Dropout(dropout)
-#         self.seg_embedding  = nn.Linear(1, self.dim_model)
+        self.dim_model = embed # 32
+        self.pad_size = pad_size # 30
+        self.dropout = nn.Dropout(dropout)
+        # self.seg_embedding  = nn.Linear(1, self.dim_model)
 
     
-#     def forward(self, x, dialog_states):
-#         dialog_states = dialog_states.view(-1,1).float() # (batch_size*pad_size)*1
-#         state_emd = self.seg_embedding(dialog_states) # (batch_size*pad_size)* 32
-#         state_emd = state_emd.view(-1,self.pad_size,self.dim_model) # batch_size * 30 * 32
+    def forward(self, x, dialog_states):
+        dialog_states = dialog_states.view(-1,1).float() # (batch_size*pad_size)*1
+        dialog_states = dialog_states.unsqueeze(-1).expand(-1,-1,self.dim_model)
+        print(dialog_states.shape)
+        # state_emd = self.seg_embedding(dialog_states) # (batch_size*pad_size)* 32
+        state_emd = state_emd.view(-1,self.pad_size,self.dim_model) # batch_size * 30 * 32
         
-#         out = x + nn.Parameter(state_emd, requires_grad=False).to(self.device)
-#         out = self.dropout(out)
-#         return out
+        out = x + nn.Parameter(state_emd, requires_grad=False).to(self.device)
+        out = self.dropout(out)
+        return out
 
 
 class Positional_Encoding(nn.Module):
@@ -214,7 +216,7 @@ class Context_Encoder(nn.Module):
         self.hidden      = 128
 
         self.position_embedding = Positional_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
-        # self.dialog_state_embedding = Dialog_State_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
+        self.dialog_state_embedding = Dialog_State_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
         # self.encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden, dropout=self.dropout)
         # self.encoders = nn.ModuleList([
         #     copy.deepcopy(self.encoder)
@@ -227,12 +229,11 @@ class Context_Encoder(nn.Module):
         out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * 32
         # print(out.shape)
 
-        # out = self.position_embedding(out)
+        out = self.position_embedding(out)
 
         # print(out.shape)
         ## add dialog state
-        # out = self.dialog_state_embedding(out, dialog_states)
-
+        out = self.dialog_state_embedding(out, dialog_states)
         # for encoder in self.encoders:
         #     out = encoder(out, dialog_states)
         
@@ -349,8 +350,6 @@ class DialogVAD(BertPreTrainedModel):
     
     def forward(self, context, context_mask, dialog_states):  
         
-        
-
         batch_size, max_ctx_len, max_utt_len = context.size() # 16 * 30 * 32
 
         context_utts = context.view(max_ctx_len, batch_size, max_utt_len)    # [batch_size * dialog_length * max_uttr_length]122
