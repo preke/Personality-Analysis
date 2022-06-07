@@ -29,7 +29,7 @@ args.test_size     = 0.1
 args.d_transformer = 768
 
 
-args.mode         = 'Context_Hierarchical'
+args.mode         = 'Uttr'# 'Context_Hierarchical'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
@@ -74,7 +74,7 @@ cnt = 0
 # [[0.5694444444444444], [0.4861111111111111], [0.5833333333333334], [0.6527777777777778], [0.5694444444444444]]
 # 0: [[0.5277777777777778], [0.5138888888888888], [0.5555555555555556], [0.6527777777777778], [0.4722222222222222]]
 
-seeds =  [0]#, 1, 13, 41, 42, 123, 456, 321, 999, 1024] # 0
+seeds =  [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024] # 0
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
