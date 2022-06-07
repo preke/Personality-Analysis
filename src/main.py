@@ -19,8 +19,8 @@ args   = parser.parse_args()
 
 args.device       = 0
 args.MAX_LEN       = 128
-args.MAX_NUM_UTTR  = 20
-args.batch_size    = 32
+args.MAX_NUM_UTTR  = 40
+args.batch_size    = 16
 args.adam_epsilon  = 1e-8
 # args.epochs        = 3
 args.num_class     = 2
@@ -29,7 +29,7 @@ args.test_size     = 0.1
 args.d_transformer = 768
 
 
-args.mode         = 'Uttr'# 'Context_Hierarchical'
+args.mode         = 'Context_Hierarchical'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
@@ -54,7 +54,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
     epoch_list = [10]
-    lr_list = [1e-5]
+    lr_list = [1e-4]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [10]
