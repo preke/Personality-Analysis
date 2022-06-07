@@ -18,9 +18,9 @@ parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
 args.device       = 0
-args.MAX_LEN       = 128
+args.MAX_LEN       = 256
 args.MAX_NUM_UTTR  = 20
-args.batch_size    = 8
+args.batch_size    = 32
 args.adam_epsilon  = 1e-8
 # args.epochs        = 3
 args.num_class     = 2
@@ -29,7 +29,7 @@ args.test_size     = 0.1
 args.d_transformer = 768
 
 
-args.mode         = 'Context_Hierarchical'
+args.mode         = 'Uttr'#'Context_Hierarchical'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
@@ -74,7 +74,7 @@ cnt = 0
 
 # 0: [[0.5277777777777778], [0.5138888888888888], [0.5555555555555556], [0.6527777777777778], [0.4722222222222222]]
 
-seeds =  [0, 1]#, 13, 41, 42, 123, 456, 321, 999, 1024]# 0
+seeds =  [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024] # 0
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
