@@ -29,7 +29,7 @@ args.test_size     = 0.1
 args.d_transformer = 768
 
 
-args.mode         = 'Context_Hierarchical'
+args.mode         = 'Uttr'#'Context_Hierarchical'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
