@@ -29,7 +29,7 @@ args.test_size     = 0.1
 args.d_transformer = 768
 
 
-args.mode         = 'Uttr'#'Context_Hierarchical'
+args.mode         = 'Context_Hierarchical'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
@@ -163,7 +163,7 @@ with open(args.result_name, 'w') as f:
                     
                     bert_mode = 'Uttr'
                     bert_lr = '1e-05'
-                    bert_batch_size = '8'
+                    bert_batch_size = '32'
                     
                     pre_trained_bert_path = './model/' + bert_mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
                                 + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed) + '/'

@@ -22,13 +22,15 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
     num_warmup_steps   = int(0*train_length) # first 1 epoch for warm-up
     num_training_steps = len(train_dataloader)*args.epochs
     
-    # for name, param in model.named_parameters():        
-    #     if name.startswith('bert'):
-    #         param.requires_grad = False
-    #     else:
-    #         print(name,param.size())
+    for name, param in model.named_parameters():        
+        if name.startswith('bert'):
+            param.requires_grad = True
+        else:
+            param.requires_grad = False
+            print(name,param.size())
     
-
+    import time
+    time.sleep(100)
     
     optimizer = AdamW(model.parameters(), lr=args.lr, eps=args.adam_epsilon, correct_bias=False)  # To reproduce BertAdam specific behavior set correct_bias=False
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_warmup_steps, num_training_steps=num_training_steps)  # PyTorch scheduler
