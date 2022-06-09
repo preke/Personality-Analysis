@@ -33,22 +33,24 @@ import re
 
 
 
-def get_vad(VAD_dict, sents):
+def get_vad(VAD_dict, sents, tokenizer):
     VAD_scores = []
     for sent in sents:
-        w_list = sent.split()
-        v_score, a_score, d_score = [], [], []
+        w_list = re.sub(r'[^\w\s\[\]]','',tokenizer.decode(sent)).split()
+        v_score, a_score, d_score = 0, 0, 0
         for word in w_list:
             try:
-                v_score.append(VAD_dict[word][0])
-                a_score.append(VAD_dict[word][1])
-                d_score.append(VAD_dict[word][2])
+                v_score += VAD_dict[word][0]
+                a_score += VAD_dict[word][1]
+                d_score += VAD_dict[word][2]
             except:
-                v_score.append(0)
-                a_score.append(0)
-                d_score.append(0)
+                v_score += 0
+                a_score += 0
+                d_score += 0
+        v_score/=float(len(w_list))
+        a_score/=float(len(w_list))
+        d_score/=float(len(w_list))
         VAD_scores.append([v_score, a_score, d_score])
-        
     return VAD_scores
 
 def get_VAD_tokenized_dict(i, VAD_tokenized_dict):
@@ -685,7 +687,7 @@ def load_data(df, args, tokenizer):
 
         dialog_states  = [eval(i) for i in df['dialog_state']]
         labels         = list(df['labels'])
-        uttr_vads      = [get_vad(args.VAD_dict, uttrs) for uttrs in dialog_context]
+        uttr_vads      = [get_vad(args.VAD_dict, sent, tokenizer) for sent in contexts]
         
 
 
