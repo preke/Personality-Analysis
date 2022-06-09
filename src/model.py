@@ -203,7 +203,7 @@ class Context_Encoder(nn.Module):
         self.pad_size    = args.MAX_NUM_UTTR
         self.dropout     = args.drop_out
         self.num_head    = 1
-        self.dim_model   = args.d_transformer # 32
+        self.dim_model   = args.d_transformer
         self.num_encoder = 1
         self.num_classes = args.num_class
         self.device      = args.device
@@ -212,27 +212,30 @@ class Context_Encoder(nn.Module):
         self.position_embedding = Positional_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
         self.dialog_state_embedding = Dialog_State_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
         self.encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden, dropout=self.dropout)
+        
         # self.encoders = nn.ModuleList([
         #     copy.deepcopy(self.encoder)
         #     for _ in range(self.num_encoder)]) # num_encoder
 
         self.fc1 = nn.Linear(self.dim_model, self.num_classes)
         
-    def forward(self, x, dialog_states, d_transformer, args):
-        out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * 32
-        # print(out.shape)
-
+    def forward(self, x, dialog_states, context_vad, d_transformer, args):
+        
+        # Semantic Aspect:
+        out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * 768
         out = self.position_embedding(out)
-
-        # print(out.shape)
         ## add dialog state
         out = self.dialog_state_embedding(out, dialog_states)
         # for encoder in self.encoders:
         #     out = encoder(out, dialog_states)
-        
-        out = self.encoder(out, dialog_states)    
-        # print(out.shape)
+        out = self.encoder(out, dialog_states)
         out = torch.mean(out, 1)
+
+        # Affective aspect:
+
+        # context_vad
+        # dialog dialog_states
+
         out = self.fc1(out)
         return out
 
@@ -333,7 +336,7 @@ class DialogVAD(BertPreTrainedModel):
         self.bert            = BertModel(config)
         # self.get_vad         = nn.Linear(config.hidden_size, 3)  # 3 for vad
         # self.reduce_size     = nn.Linear(config.hidden_size, self.d_transformer) # from 768 reduce to 64 for the appended Transformer model
-
+        self.vad_to_hidden = nn.Linear(3, self.dim_model)
 
         self.context_encoder = Context_Encoder(args)
         # self.personality_cls     = nn.Linear(config.hidden_size, 2) # binary classification
@@ -342,24 +345,27 @@ class DialogVAD(BertPreTrainedModel):
     def forward(self, context, context_mask, dialog_states, context_vad):  
         
         batch_size, max_ctx_len, max_utt_len = context.size() # 16 * 30 * 32
-        print(context_vad.shape) # batch_size * dialog_length * max_len 
+        
 
         context_utts = context.view(max_ctx_len, batch_size, max_utt_len)    # [batch_size * dialog_length * max_uttr_length]122
         context_mask = context_mask.view(max_ctx_len, batch_size, max_utt_len)   
 
         uttr_outputs  = [self.bert(uttr, uttr_mask) for uttr, uttr_mask in zip(context_utts,context_mask)]
-        # 30 * 16 * 768 
-
-        uttr_outputs = [uttr_output[1] for uttr_output in uttr_outputs] # 30 * 16 * 768 
-        # uttr_embeddings = torch.stack([self.reduce_size(uttr_output) for uttr_output in uttr_outputs]) # 30 * 16 * 32
+        uttr_outputs  = [uttr_output[1] for uttr_output in uttr_outputs] # 30 * 16 * 768 
         uttr_embeddings = torch.stack(uttr_outputs) # 30 * 16 * 768
-
         uttr_embeddings = torch.autograd.Variable(uttr_embeddings.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
-        # ## vad regression
-        # # logit_vads      = self.get_vad(uttr_embedding).view(-1, 10, 3) # [batch_size * dialog_length * 3]
+
+
+        context_vad = context_vad.view(max_ctx_len, batch_size, 3)
+        context_vad = [self.vad_to_hidden(uttr_vad) for uttr_vad in context_vad]
+        context_vad = torch.stack(context_vad)
+        context_vad = torch.autograd.Variable(context_vad.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
+
         
+
+
         # ---- concat with transformer to do the self-attention
-        logits = self.context_encoder(uttr_embeddings, dialog_states, self.d_transformer, self.args) # [batch_size * 2]
+        logits = self.context_encoder(uttr_embeddings, dialog_states, context_vad, self.d_transformer, self.args) # [batch_size * 2]
 
         return logits#, logit_vads
 
