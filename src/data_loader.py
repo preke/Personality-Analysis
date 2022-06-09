@@ -668,6 +668,7 @@ def load_data(df, args, tokenizer):
         
         print(len(contexts))
         print([len(i) for i in contexts])
+        print(uttr_vads[0])
         
 
         #vad_scores = torch.Tensor(vad_scores)
