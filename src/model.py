@@ -221,6 +221,9 @@ class Context_Encoder(nn.Module):
         
     def forward(self, x, dialog_states, context_vad, d_transformer, args):
         
+        print(x.shape)
+        print(dialog_states.shape)
+        print(context_vad.shape)
         # Semantic Aspect:
         semantic_out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * d_model
         semantic_out = self.position_embedding(semantic_out)
@@ -338,7 +341,7 @@ class DialogVAD(BertPreTrainedModel):
         super().__init__(config)
         self.args            = args
         self.num_labels      = args.num_class
-        self.d_transformer   = config.hidden_size #args.d_transformer
+        self.d_transformer   = args.d_transformer
         self.config          = config
         self.bert            = BertModel(config)
         # self.get_vad         = nn.Linear(config.hidden_size, 3)  # 3 for vad
