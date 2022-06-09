@@ -13,10 +13,10 @@ import re
 
 # class Preprocessing:
 
-def get_vad(VAD_dict, sents, tokenizer):
+def get_vad(VAD_dict, sents):
     VAD_scores = []
     for sent in sents:
-        w_list = re.sub(r'[^\w\s\[\]]','',tokenizer.decode(sent)).split()
+        w_list = sent.split()
         v_score, a_score, d_score = [], [], []
         for word in w_list:
             try:
@@ -664,7 +664,7 @@ def load_data(df, args, tokenizer):
 
         dialog_states  = [eval(i) for i in df['dialog_state']]
         labels         = list(df['labels'])
-        uttr_vads      = [get_vad(args.VAD_dict, sent, tokenizer) for sent in contexts]
+        uttr_vads      = [get_vad(args.VAD_dict, sent) for sent in dialog_context]
         
         print(len(contexts))
         print([len(i) for i in contexts])
