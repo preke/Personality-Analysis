@@ -244,7 +244,7 @@ class Context_Encoder(nn.Module):
         affective_out = self.encoder(affective_out, dialog_states)
         affective_out = torch.mean(affective_out, 1)
 
-        out = torch.concat([semantic_out, affective_out])
+        out = torch.cat([semantic_out, affective_out], dim=1)
 
         out = self.fc1(out)
         return out
