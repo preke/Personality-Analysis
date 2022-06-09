@@ -17,20 +17,16 @@ def get_vad(VAD_dict, sents, tokenizer):
     VAD_scores = []
     for sent in sents:
         w_list = re.sub(r'[^\w\s\[\]]','',tokenizer.decode(sent)).split()
-        v_score, a_score, d_score = 0, 0, 0
+        v_score, a_score, d_score = [], [], []
         for word in w_list:
             try:
-                v_score += VAD_dict[word][0]
-                a_score += VAD_dict[word][1]
-                d_score += VAD_dict[word][2]
+                v_score.append(VAD_dict[word][0])
+                a_score.append(VAD_dict[word][1])
+                d_score.append(VAD_dict[word][2])
             except:
-                v_score += 0
-                a_score += 0
-                d_score += 0
-
-        v_score/=float(len(w_list))
-        a_score/=float(len(w_list))
-        d_score/=float(len(w_list))
+                v_score.append(0)
+                a_score.append(0)
+                d_score.append(0)
         VAD_scores.append([v_score, a_score, d_score])
     return VAD_scores
 
@@ -193,6 +189,10 @@ def load_data(df, args, tokenizer):
             sent_seg_embeddings.append([1]*len(uttrs[i]) + [0]*len(contexts[i][1:]))
         
         vad_scores = get_vad(args.VAD_dict, sents, tokenizer)
+        vad_scores = torch.Tensor(vad_scores)
+        print(vad_scores.shape)
+        import time
+        time.sleep(100)
         
         labels = list(df['labels'])
 
