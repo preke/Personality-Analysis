@@ -107,7 +107,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
             elif args.mode == 'Context_Hierarchical':
                 b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
                 # logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
-                logits = model(b_contexts, b_context_masks, b_dialog_states)
+                logits = model(b_contexts, b_context_masks, b_dialog_states, b_vad_scores)
                 
                 # loss_mse            = nn.MSELoss()
                 # vad_loss            = loss_mse(logit_vads, b_vad_scores)

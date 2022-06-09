@@ -339,9 +339,10 @@ class DialogVAD(BertPreTrainedModel):
         # self.personality_cls     = nn.Linear(config.hidden_size, 2) # binary classification
         self.init_weights()
     
-    def forward(self, context, context_mask, dialog_states):  
+    def forward(self, context, context_mask, dialog_states, context_vad):  
         
         batch_size, max_ctx_len, max_utt_len = context.size() # 16 * 30 * 32
+        print(context_vad.shape) # batch_size * dialog_length * max_len 
 
         context_utts = context.view(max_ctx_len, batch_size, max_utt_len)    # [batch_size * dialog_length * max_uttr_length]122
         context_mask = context_mask.view(max_ctx_len, batch_size, max_utt_len)   

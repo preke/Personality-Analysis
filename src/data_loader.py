@@ -13,6 +13,26 @@ import re
 
 # class Preprocessing:
 
+# def get_vad(VAD_dict, sents):
+#     VAD_scores = []
+#     for sent in sents:
+#         w_list = sent.split()
+#         v_score, a_score, d_score = [], [], []
+#         for word in w_list:
+#             try:
+#                 v_score.append(VAD_dict[word][0])
+#                 a_score.append(VAD_dict[word][1])
+#                 d_score.append(VAD_dict[word][2])
+#             except:
+#                 v_score.append(0)
+#                 a_score.append(0)
+#                 d_score.append(0)
+#         VAD_scores.append([v_score, a_score, d_score])
+        
+#     return VAD_scores
+
+
+
 def get_vad(VAD_dict, sents):
     VAD_scores = []
     for sent in sents:
@@ -668,16 +688,13 @@ def load_data(df, args, tokenizer):
         uttr_vads      = [get_vad(args.VAD_dict, uttrs) for uttrs in dialog_context]
         
 
-        vad_scores = torch.Tensor(uttr_vads)
-        print(vad_scores.shape)
-        import time
-        time.sleep(100)
 
         contexts      = padding_uttrs(contexts, [0]*args.MAX_LEN, args) # padding_element: [PAD]
         context_masks = padding_uttrs(context_masks, [0]*args.MAX_LEN, args) # padding_element: [PAD]
         
         dialog_states = padding_uttrs(dialog_states, -1, args)
         uttr_vads     = padding_uttrs(uttr_vads, [0.0, 0.0, 0.0], args)
+
 
         
         print('-------------------------------------')
