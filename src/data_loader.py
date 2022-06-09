@@ -28,7 +28,7 @@ def get_vad(VAD_dict, sents):
                 a_score.append(0)
                 d_score.append(0)
         VAD_scores.append([v_score, a_score, d_score])
-        print(sent, VAD_scores)
+        print(sent, [v_score, a_score, d_score])
     import time
     time.sleep(100)
     return VAD_scores
