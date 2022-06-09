@@ -217,24 +217,31 @@ class Context_Encoder(nn.Module):
         #     copy.deepcopy(self.encoder)
         #     for _ in range(self.num_encoder)]) # num_encoder
 
-        self.fc1 = nn.Linear(self.dim_model, self.num_classes)
+        self.fc1 = nn.Linear(self.dim_model*2, self.num_classes)
         
     def forward(self, x, dialog_states, context_vad, d_transformer, args):
         
         # Semantic Aspect:
-        out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * 768
-        out = self.position_embedding(out)
+        semantic_out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * d_model
+        semantic_out = self.position_embedding(semantic_out)
         ## add dialog state
-        out = self.dialog_state_embedding(out, dialog_states)
+        semantic_out = self.dialog_state_embedding(semantic_out, dialog_states)
         # for encoder in self.encoders:
-        #     out = encoder(out, dialog_states)
-        out = self.encoder(out, dialog_states)
-        out = torch.mean(out, 1)
+        #     semantic_out = encoder(semantic_out, dialog_states)
+        semantic_out = self.encoder(semantic_out, dialog_states)
+        semantic_out = torch.mean(semantic_out, 1)
 
         # Affective aspect:
+        affective_out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * d_model
+        affective_out = self.position_embedding(affective_out)
+        ## add dialog state
+        affective_out = self.dialog_state_embedding(affective_out, dialog_states)
+        # for encoder in self.encoders:
+        #     affective_out = encoder(affective_out, dialog_states)
+        affective_out = self.encoder(affective_out, dialog_states)
+        affective_out = torch.mean(affective_out, 1)
 
-        # context_vad
-        # dialog dialog_states
+        out = torch.concat([semantic_out, affective_out])
 
         out = self.fc1(out)
         return out
@@ -336,7 +343,7 @@ class DialogVAD(BertPreTrainedModel):
         self.bert            = BertModel(config)
         # self.get_vad         = nn.Linear(config.hidden_size, 3)  # 3 for vad
         # self.reduce_size     = nn.Linear(config.hidden_size, self.d_transformer) # from 768 reduce to 64 for the appended Transformer model
-        self.vad_to_hidden = nn.Linear(3, self.dim_model)
+        self.vad_to_hidden = nn.Linear(3, self.d_transformer)
 
         self.context_encoder = Context_Encoder(args)
         # self.personality_cls     = nn.Linear(config.hidden_size, 2) # binary classification
