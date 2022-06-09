@@ -342,7 +342,7 @@ class DialogVAD(BertPreTrainedModel):
         self.config          = config
         self.bert            = BertModel(config)
         # self.get_vad         = nn.Linear(config.hidden_size, 3)  # 3 for vad
-        # self.reduce_size     = nn.Linear(config.hidden_size, self.d_transformer) # from 768 reduce to 64 for the appended Transformer model
+        self.reduce_size     = nn.Linear(config.hidden_size, self.d_transformer) # from 768 reduce to 64 for the appended Transformer model
         self.vad_to_hidden = nn.Linear(3, self.d_transformer)
 
         self.context_encoder = Context_Encoder(args)
@@ -358,7 +358,7 @@ class DialogVAD(BertPreTrainedModel):
         context_mask = context_mask.view(max_ctx_len, batch_size, max_utt_len)   
 
         uttr_outputs  = [self.bert(uttr, uttr_mask) for uttr, uttr_mask in zip(context_utts,context_mask)]
-        uttr_outputs  = [uttr_output[1] for uttr_output in uttr_outputs] # 30 * 16 * 768 
+        uttr_outputs  = [self.reduce_size(uttr_output[1]) for uttr_output in uttr_outputs] # 30 * 16 * 768 
         uttr_embeddings = torch.stack(uttr_outputs) # 30 * 16 * 768
         uttr_embeddings = torch.autograd.Variable(uttr_embeddings.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
 
