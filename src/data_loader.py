@@ -189,10 +189,7 @@ def load_data(df, args, tokenizer):
             sent_seg_embeddings.append([1]*len(uttrs[i]) + [0]*len(contexts[i][1:]))
         
         vad_scores = get_vad(args.VAD_dict, sents, tokenizer)
-        vad_scores = torch.Tensor(vad_scores)
-        print(vad_scores.shape)
-        import time
-        time.sleep(100)
+
         
         labels = list(df['labels'])
 
@@ -669,7 +666,10 @@ def load_data(df, args, tokenizer):
         labels         = list(df['labels'])
         uttr_vads      = [get_vad(args.VAD_dict, sent, tokenizer) for sent in contexts]
         
-      
+        vad_scores = torch.Tensor(vad_scores)
+        print(vad_scores.shape)
+        import time
+        time.sleep(100)
 
         contexts      = padding_uttrs(contexts, [0]*args.MAX_LEN, args) # padding_element: [PAD]
         context_masks = padding_uttrs(context_masks, [0]*args.MAX_LEN, args) # padding_element: [PAD]
