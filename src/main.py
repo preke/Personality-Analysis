@@ -246,6 +246,8 @@ with open(args.result_name, 'w') as f:
             test_acc_all_seeds.append(test_acc)
             print('Current Seed is', seed)
             print('Test acc:', test_acc)
+            print('*'* 10, test_acc_total)
+            print()
             
         test_acc_total.append(test_acc_all_seeds)
         print('\n========\n')
