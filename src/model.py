@@ -221,9 +221,7 @@ class Context_Encoder(nn.Module):
         
     def forward(self, x, dialog_states, context_vad, d_transformer, args):
         
-        print(x.shape)
-        print(dialog_states.shape)
-        print(context_vad.shape)
+       
         # Semantic Aspect:
         semantic_out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * d_model
         semantic_out = self.position_embedding(semantic_out)
