@@ -27,7 +27,11 @@ def get_vad(VAD_dict, sents):
                 v_score.append(0)
                 a_score.append(0)
                 d_score.append(0)
+            print(word, v_score, a_score, d_score)
         VAD_scores.append([v_score, a_score, d_score])
+        print()
+    import time
+    time.sleep(100)
     return VAD_scores
 
 def get_VAD_tokenized_dict(i, VAD_tokenized_dict):
