@@ -28,9 +28,7 @@ def get_vad(VAD_dict, sents):
                 a_score.append(0)
                 d_score.append(0)
         VAD_scores.append([v_score, a_score, d_score])
-        print(sent, [v_score, a_score, d_score])
-    import time
-    time.sleep(100)
+        
     return VAD_scores
 
 def get_VAD_tokenized_dict(i, VAD_tokenized_dict):
@@ -667,15 +665,11 @@ def load_data(df, args, tokenizer):
 
         dialog_states  = [eval(i) for i in df['dialog_state']]
         labels         = list(df['labels'])
-        uttr_vads      = [get_vad(args.VAD_dict, sent) for sent in dialog_context]
-        
-        print(len(contexts))
-        print([len(i) for i in contexts])
-        print(uttr_vads[0])
+        uttr_vads      = [get_vad(args.VAD_dict, uttrs) for uttrs in dialog_context]
         
 
-        #vad_scores = torch.Tensor(vad_scores)
-        #print(vad_scores.shape)
+        vad_scores = torch.Tensor(uttr_vads)
+        print(vad_scores.shape)
         import time
         time.sleep(100)
 
