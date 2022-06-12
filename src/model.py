@@ -93,7 +93,7 @@ class Context_Encoder(nn.Module):
         self.num_encoder = 1
         self.num_classes = args.num_class
         self.device      = args.device
-        self.hidden      = 128
+        self.hidden      = 512
 
         self.position_embedding = Positional_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
         self.dialog_state_embedding = Dialog_State_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
