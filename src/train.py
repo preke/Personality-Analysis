@@ -143,7 +143,6 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
             # Validation
             # Put model in evaluation mode to evaluate loss on the validation set
             if step%5 == 0:
-                model.eval()
                 eval_acc = eval_model(model, args, valid_dataloader)
                 if eval_acc > best_eval_acc:
                             best_eval_acc = eval_acc
@@ -189,6 +188,7 @@ def eval_model(model, args, valid_dataloader):
         batch = tuple(t.cuda(args.device) for t in batch)
 
         # Telling the model not to compute or store gradients, saving memory and speeding up validation
+        model.eval()
         with torch.no_grad():
             if args.mode == 'Ours':
                 b_uttrs, b_uttr_mask, b_dialog_ids, b_dialog_mask, b_seg_embeddings, b_vad_scores, b_labels = batch
