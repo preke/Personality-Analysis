@@ -18,7 +18,7 @@ class RobertaClassificationHead(nn.Module):
     def __init__(self, config, num_labels):
         super().__init__()        
         self.dense = nn.Linear(config.hidden_size, config.hidden_size)
-        self.dropout = nn.Dropout(0.1)
+        # self.dropout = nn.Dropout(0.1)
         self.num_labels = num_labels
         self.out_proj = nn.Linear(config.hidden_size, self.num_labels)
 
@@ -27,7 +27,7 @@ class RobertaClassificationHead(nn.Module):
         x = self.dropout(x)
         x = self.dense(x)
         x = torch.tanh(x)
-        x = self.dropout(x)
+        # x = self.dropout(x)
         x = self.out_proj(x)
         return x
 
@@ -56,13 +56,13 @@ class Dialog_State_Encoding(nn.Module):
 
         self.dim_model = embed # 32
         self.pad_size = pad_size # 30
-        self.dropout = nn.Dropout(dropout)
+        # self.dropout = nn.Dropout(dropout)
 
     
     def forward(self, x, dialog_states):
         dialog_states = dialog_states.float().unsqueeze(-1).expand(-1,-1,self.dim_model)        
         out = x + nn.Parameter(dialog_states, requires_grad=False).to(self.device)
-        out = self.dropout(out)
+        # out = self.dropout(out)
         return out
 
 
@@ -73,11 +73,11 @@ class Positional_Encoding(nn.Module):
         self.pe = torch.tensor([[pos / (10000.0 ** (i // 2 * 2.0 / embed)) for i in range(embed)] for pos in range(pad_size)])
         self.pe[:, 0::2] = np.sin(self.pe[:, 0::2])
         self.pe[:, 1::2] = np.cos(self.pe[:, 1::2])
-        self.dropout = nn.Dropout(dropout)
+        # self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         out = x + nn.Parameter(self.pe, requires_grad=False).to(self.device)
-        out = self.dropout(out)
+        # out = self.dropout(out)
         return out
 
 
@@ -87,7 +87,7 @@ class Context_Encoder(nn.Module):
 
         self.args        = args
         self.pad_size    = args.MAX_NUM_UTTR
-        self.dropout     = args.drop_out
+        # self.dropout     = args.drop_out
         self.num_head    = 1
         self.dim_model   = args.d_transformer
         self.num_encoder = 1

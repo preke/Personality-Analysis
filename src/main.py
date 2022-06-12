@@ -24,12 +24,12 @@ args.batch_size    = 32
 args.adam_epsilon  = 1e-8
 # args.epochs        = 3
 args.num_class     = 2
-args.drop_out      = 0.1
+# args.drop_out      = 0.1
 args.test_size     = 0.1
 args.d_transformer = 32
 
 
-args.mode         = 'Uttr'
+args.mode         = 'Context_Hierarchical'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
@@ -46,7 +46,7 @@ for r in VAD_Lexicons.iterrows():
 args.VAD_dict = VAD_dict
 
 
-personalities = ['A','C','E','O','N']
+personalities = ['E'] #['A','C','E','O','N']
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
