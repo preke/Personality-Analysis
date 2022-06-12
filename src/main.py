@@ -46,7 +46,7 @@ for r in VAD_Lexicons.iterrows():
 args.VAD_dict = VAD_dict
 
 
-personalities = ['E'] #['A','C','E','O','N']
+personalities = ['A','C','O','N']# 'E' 
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -60,7 +60,7 @@ elif args.BASE == 'RoBERTa':
     epoch_list = [10]
     lr_list = [2e-4]
 
-args.lr            = lr_list[0]
+args.lr = lr_list[0]
 
 
 
@@ -117,7 +117,6 @@ with open(args.result_name, 'w') as f:
                 '''
                 model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', \
                             num_labels=args.num_class).cuda(args.device)
-                
 
             elif args.mode == 'Context_Hierarchical':
                 '''
@@ -137,15 +136,9 @@ with open(args.result_name, 'w') as f:
                 
                 elif args.BASE == 'RoBERTa':
                     model     = DialogVAD_roberta.from_pretrained('roberta-base').cuda(args.device)
-                
-            
 
             training_loss, best_eval_acc = train_model(model, args, train_dataloader, valid_dataloader, train_length)
             
-            
-           
-            
-
             if args.mode == 'Context' or args.mode == 'baseline_3.1':
                 model = BertForSequenceClassification.from_pretrained(args.model_path, \
                        num_labels=args.num_class).cuda(args.device)

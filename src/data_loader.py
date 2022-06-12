@@ -769,7 +769,6 @@ def load_data(df, args, tokenizer):
         return train_dataloader, valid_dataloader, test_dataloader, train_length
         # return train_dataloader, test_dataloader, train_length
     
-    
     elif args.mode == 'Uttr':
         
         uttrs = [tokenizer.encode(sent, add_special_tokens=True, max_length=args.MAX_LEN, \

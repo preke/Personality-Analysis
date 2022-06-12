@@ -186,7 +186,6 @@ def eval_model(model, args, valid_dataloader):
     for batch in valid_dataloader:
         # Add batch to GPU
         batch = tuple(t.cuda(args.device) for t in batch)
-
         # Telling the model not to compute or store gradients, saving memory and speeding up validation
         model.eval()
         with torch.no_grad():
