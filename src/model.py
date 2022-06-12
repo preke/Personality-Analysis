@@ -10,74 +10,42 @@ import numpy as np
 
 
 
-class RobertaClassificationHead(nn.Module):
-    """
-    Head for sentence-level classification tasks.
-    """
-
-    def __init__(self, config, num_labels):
-        super().__init__()        
-        self.dense = nn.Linear(config.hidden_size, config.hidden_size)
-        # self.dropout = nn.Dropout(0.1)
-        self.num_labels = num_labels
-        self.out_proj = nn.Linear(config.hidden_size, self.num_labels)
-
-    def forward(self, features):
-        x = features
-        # x = self.dropout(x) 
-        x = self.dense(x)
-        x = torch.tanh(x)
-        # x = self.dropout(x)
-        x = self.out_proj(x)
-        return x
-
-
-
     
 
 class Encoder(nn.Module):
-    def __init__(self, dim_model, num_head, hidden, dropout):
+    def __init__(self, dim_model, num_head, hidden):
         super(Encoder, self).__init__()
-        self.attention = Multi_Head_Attention(dim_model, num_head, dropout)
-        self.feed_forward = Position_wise_Feed_Forward(dim_model, hidden, dropout)
+        self.attention = Multi_Head_Attention(dim_model, num_head)
 
     def forward(self, x, dialog_states):
         out = self.attention(x, dialog_states)
-        out = self.feed_forward(out)
         return out
 
 
 class Dialog_State_Encoding(nn.Module):
-    def __init__(self, embed, pad_size, dropout, device):
+    def __init__(self, embed, pad_size, device):
         super(Dialog_State_Encoding, self).__init__()
         self.device = device
-        
-        # calculate the dialog state encoding
-
         self.dim_model = embed # 32
         self.pad_size = pad_size # 30
-        # self.dropout = nn.Dropout(dropout)
 
     
     def forward(self, x, dialog_states):
         dialog_states = dialog_states.float().unsqueeze(-1).expand(-1,-1,self.dim_model)        
         out = x + nn.Parameter(dialog_states, requires_grad=False).to(self.device)
-        # out = self.dropout(out)
         return out
 
 
 class Positional_Encoding(nn.Module):
-    def __init__(self, embed, pad_size, dropout, device):
+    def __init__(self, embed, pad_size, device):
         super(Positional_Encoding, self).__init__()
         self.device = device
         self.pe = torch.tensor([[pos / (10000.0 ** (i // 2 * 2.0 / embed)) for i in range(embed)] for pos in range(pad_size)])
         self.pe[:, 0::2] = np.sin(self.pe[:, 0::2])
         self.pe[:, 1::2] = np.cos(self.pe[:, 1::2])
-        # self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         out = x + nn.Parameter(self.pe, requires_grad=False).to(self.device)
-        # out = self.dropout(out)
         return out
 
 
@@ -87,7 +55,6 @@ class Context_Encoder(nn.Module):
 
         self.args        = args
         self.pad_size    = args.MAX_NUM_UTTR
-        self.dropout     = args.drop_out
         self.num_head    = 1
         self.dim_model   = args.d_transformer
         self.num_encoder = 1
@@ -95,9 +62,9 @@ class Context_Encoder(nn.Module):
         self.device      = args.device
         self.hidden      = 512
 
-        self.position_embedding = Positional_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
-        self.dialog_state_embedding = Dialog_State_Encoding(embed=self.dim_model, pad_size=self.pad_size, dropout=self.dropout, device=self.device)
-        self.encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden, dropout=self.dropout)
+        self.position_embedding = Positional_Encoding(embed=self.dim_model, pad_size=self.pad_size, device=self.device)
+        self.dialog_state_embedding = Dialog_State_Encoding(embed=self.dim_model, pad_size=self.pad_size, device=self.device)
+        self.encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden)
         
         # self.encoders = nn.ModuleList([
         #     copy.deepcopy(self.encoder)
@@ -168,7 +135,7 @@ class Scaled_Dot_Product_Attention(nn.Module):
 
 
 class Multi_Head_Attention(nn.Module):
-    def __init__(self, dim_model, num_head, dropout=0.0):
+    def __init__(self, dim_model, num_head):
         super(Multi_Head_Attention, self).__init__()
         self.num_head = num_head
         assert dim_model % num_head == 0
@@ -177,8 +144,6 @@ class Multi_Head_Attention(nn.Module):
         self.fc_K = nn.Linear(dim_model, num_head * self.dim_head)
         self.fc_V = nn.Linear(dim_model, num_head * self.dim_head)
         self.attention = Scaled_Dot_Product_Attention()
-        # self.fc = nn.Linear(num_head * self.dim_head, dim_model)
-        # self.dropout = nn.Dropout(dropout)
         self.layer_norm = nn.LayerNorm(dim_model)
 
     def forward(self, x, dialog_states):
@@ -194,29 +159,10 @@ class Multi_Head_Attention(nn.Module):
         context = self.attention(Q, K, V, scale, dialog_states)
 
         context = context.view(batch_size, -1, self.dim_head * self.num_head)
-        # out = self.fc(context)
-        # out = self.dropout(context)
-        out = out + x  # 残差连接
+        out = context + x  # 残差连接
         out = self.layer_norm(out)
         return out
 
-
-class Position_wise_Feed_Forward(nn.Module):
-    def __init__(self, dim_model, hidden, dropout=0.5):
-        super(Position_wise_Feed_Forward, self).__init__()
-        self.fc1 = nn.Linear(dim_model, hidden)
-        self.fc2 = nn.Linear(hidden, dim_model)
-        # self.dropout = nn.Dropout(dropout)
-        self.layer_norm = nn.LayerNorm(dim_model)
-
-    def forward(self, x):
-        out = self.fc1(x)
-        out = F.relu(out)
-        out = self.fc2(out)
-        # out = self.dropout(out)
-        out = out + x  # 残差连接
-        out = self.layer_norm(out)
-        return out
 
 
 class DialogVAD(BertPreTrainedModel):
@@ -250,10 +196,10 @@ class DialogVAD(BertPreTrainedModel):
         uttr_embeddings = torch.autograd.Variable(uttr_embeddings.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
 
 
-        # context_vad = context_vad.view(max_ctx_len, batch_size, 3)
-        # context_vad = [self.vad_to_hidden(uttr_vad) for uttr_vad in context_vad]
-        # context_vad = torch.stack(context_vad)
-        # context_vad = torch.autograd.Variable(context_vad.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
+        context_vad = context_vad.view(max_ctx_len, batch_size, 3)
+        context_vad = [self.vad_to_hidden(uttr_vad) for uttr_vad in context_vad]
+        context_vad = torch.stack(context_vad)
+        context_vad = torch.autograd.Variable(context_vad.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
 
         
 

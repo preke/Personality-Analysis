@@ -24,7 +24,7 @@ args.batch_size    = 32
 args.adam_epsilon  = 1e-8
 # args.epochs        = 3
 args.num_class     = 2
-args.drop_out      = 0.1
+# args.drop_out      = 0.1
 args.test_size     = 0.1
 args.d_transformer = 512
 
