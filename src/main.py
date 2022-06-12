@@ -10,7 +10,7 @@ from transformers import BertTokenizer, BertConfig, BertForSequenceClassificatio
 
 from data_loader import load_data
 from train import train_model, eval_model, train_model_again
-from model import Baseline_1, Baseline_2, Uttr_VAD_embedding, DialogVAD, Baseline_1_roberta, DialogVAD_roberta
+from model import DialogVAD, DialogVAD_roberta
 from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaForSequenceClassification
 # CONFIG
 
