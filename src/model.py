@@ -32,121 +32,7 @@ class RobertaClassificationHead(nn.Module):
         return x
 
 
-class Baseline_1_roberta(RobertaModel):
-    def __init__(self, config):
-        super().__init__(config)
-        self.num_labels      = 2
-        self.config          = config
-        self.roberta         = RobertaModel(config)
-        self.personality_cls = RobertaClassificationHead(config, num_labels=self.num_labels)
-        self.get_vad         = RobertaClassificationHead(config, num_labels=3)
-        self.init_weights()
-    
-    def forward(self, text, token_type_ids=None, attention_mask=None):  
-        if token_type_ids:
-            outputs   = self.roberta(text, token_type_ids=token_type_ids, attention_mask=attention_mask)
-        else:
-            outputs   = self.roberta(text, attention_mask=attention_mask)
-        embedding = outputs[1]
-        logit_p   = self.personality_cls(embedding)
-        logit_vad = self.get_vad(embedding)
-        return logit_p, logit_vad
-    
 
-
-
-class Baseline_1(BertPreTrainedModel):
-    def __init__(self, config):
-        super().__init__(config)
-        self.num_labels      = 2
-        self.config          = config
-        self.bert            = BertModel(config)
-        self.personality_cls = nn.Linear(config.hidden_size, self.num_labels)
-        self.get_vad         = nn.Linear(config.hidden_size, 3)  # 3 for vad
-        self.init_weights()
-    
-    def forward(self, text, token_type_ids=None, attention_mask=None):  
-        if token_type_ids:
-            outputs   = self.bert(text, token_type_ids=token_type_ids, attention_mask=attention_mask)
-        else:
-            outputs   = self.bert(text, attention_mask=attention_mask)
-        embedding = outputs[1]
-        logit_p   = self.personality_cls(embedding)
-        logit_vad = self.get_vad(embedding)
-        return logit_p, logit_vad
-    
-
-class Baseline_2(BertPreTrainedModel):
-    
-    def __init__(self, config):
-        super().__init__(config)
-        self.num_labels      = 2
-        self.config          = config
-        self.bert            = BertModel(config)
-        self.personality_cls = nn.Linear(config.hidden_size, self.num_labels)
-        self.get_vad         = nn.Linear(config.hidden_size, 3)  # 3 for vad
-        self.init_weights()
-    
-
-    def forward(self, uttr, uttr_mask, dialog, dialog_mask, dialog_seg_embeddings):  
-        
-        # print(self.config)
-        
-        uttr_outputs  = self.bert(uttr, attention_mask=uttr_mask)
-        uttr_embedding = uttr_outputs[1]
-        logit_vad = self.get_vad(uttr_embedding)
-
-        dialog_outputs  = self.bert(dialog, token_type_ids=dialog_seg_embeddings, attention_mask=dialog_mask)
-        dialog_embedding = dialog_outputs[1]
-        logit_p   = self.personality_cls(dialog_embedding)
-        return logit_p, logit_vad   
-    
-
-    
-class Uttr_VAD_embedding(BertPreTrainedModel):
-    
-    def __init__(self, config):
-        super().__init__(config)
-        self.num_labels      = 2
-        self.config          = config
-        self.bert            = BertModel(config)
-        self.vad_to_embed    = nn.Linear(3, config.hidden_size)
-        self.personality_cls = nn.Linear(config.hidden_size, self.num_labels)
-        self.init_weights()
-
-    def forward(self, uttr, attention_mask, segment_embeddings=None):  
-        
-        uttr_input_embeddings = self.vad_to_embed(uttr)
-        if segment_embeddings != None:
-            uttr_outputs  = self.bert(attention_mask=attention_mask, inputs_embeds=uttr_input_embeddings, token_type_ids=segment_embeddings)
-        else:
-            uttr_outputs  = self.bert(attention_mask=attention_mask, inputs_embeds=uttr_input_embeddings)
-        uttr_embedding = uttr_outputs[1]
-        logit_p = self.personality_cls(uttr_embedding)
-        return logit_p
-
-class Uttr_VAD_embedding_lookup(BertPreTrainedModel):
-    
-    def __init__(self, config):
-        super().__init__(config)
-        self.num_labels      = 2
-        self.config          = config
-        self.bert            = BertModel(config)
-        self.vad_to_embed    = nn.Linear(3, config.hidden_size)
-        self.personality_cls = nn.Linear(config.hidden_size, self.num_labels)
-        self.init_weights()
-
-    def forward(self, uttr, attention_mask, segment_embeddings=None):  
-        
-        uttr_input_embeddings = self.vad_to_embed(uttr)
-        if segment_embeddings != None:
-            uttr_outputs  = self.bert(attention_mask=attention_mask, inputs_embeds=uttr_input_embeddings, token_type_ids=segment_embeddings)
-        else:
-            uttr_outputs  = self.bert(attention_mask=attention_mask, inputs_embeds=uttr_input_embeddings)
-        uttr_embedding = uttr_outputs[1]
-        logit_p = self.personality_cls(uttr_embedding)
-        return logit_p
-    
     
 
 class Encoder(nn.Module):
@@ -364,10 +250,10 @@ class DialogVAD(BertPreTrainedModel):
         uttr_embeddings = torch.autograd.Variable(uttr_embeddings.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
 
 
-        context_vad = context_vad.view(max_ctx_len, batch_size, 3)
-        context_vad = [self.vad_to_hidden(uttr_vad) for uttr_vad in context_vad]
-        context_vad = torch.stack(context_vad)
-        context_vad = torch.autograd.Variable(context_vad.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
+        # context_vad = context_vad.view(max_ctx_len, batch_size, 3)
+        # context_vad = [self.vad_to_hidden(uttr_vad) for uttr_vad in context_vad]
+        # context_vad = torch.stack(context_vad)
+        # context_vad = torch.autograd.Variable(context_vad.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
 
         
 

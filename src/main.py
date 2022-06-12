@@ -17,10 +17,10 @@ from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaF
 parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
-args.device       = 0
+args.device        = 0
 args.MAX_LEN       = 128
-args.MAX_NUM_UTTR  = 20
-args.batch_size    =8
+args.MAX_NUM_UTTR  = 40
+args.batch_size    = 16
 args.adam_epsilon  = 1e-8
 # args.epochs        = 3
 args.num_class     = 2
@@ -29,7 +29,7 @@ args.test_size     = 0.1
 args.d_transformer = 32
 
 
-args.mode         = 'Context_Hierarchical'
+args.mode         = 'Uttr'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
@@ -53,8 +53,8 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-    epoch_list = [10]
-    lr_list = [1e-5]
+    epoch_list = [3]
+    lr_list = [4e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [10]
