@@ -131,7 +131,7 @@ with open(args.result_name, 'w') as f:
                     bert_batch_size = '32'
                     
                     pre_trained_bert_path = './model/' + bert_mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
-                                + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed) + '/'
+                                + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed)  + '_with_attn_affective/'
                     
                     model = DialogVAD.from_pretrained(pre_trained_bert_path, args=args).cuda(args.device)
                 
