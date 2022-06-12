@@ -362,14 +362,14 @@ def train_model_again(model, args, train_dataloader, valid_dataloader, train_len
                     try:
                         shutil.rmtree(args.model_path)
                     except:
-                        print(traceback.print_exc())
+                        print('DELETE ERROR', traceback.print_exc())
                         os.mkdir(args.model_path)
 
                     try:
                         model.save_pretrained(args.model_path)
                         print('****** saved new model to ' + args.model_path + ' ******')
                     except:
-                        print(traceback.print_exc())
+                        print('SAVE ERROR', traceback.print_exc())
         else:
             print('EVAL ACC:', eval_acc, ' ', 'BEST_ACC', best_eval_acc)
             
