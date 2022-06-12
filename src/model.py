@@ -24,7 +24,7 @@ class RobertaClassificationHead(nn.Module):
 
     def forward(self, features):
         x = features
-        x = self.dropout(x)
+        # x = self.dropout(x) 
         x = self.dense(x)
         x = torch.tanh(x)
         # x = self.dropout(x)
@@ -178,7 +178,7 @@ class Multi_Head_Attention(nn.Module):
         self.fc_V = nn.Linear(dim_model, num_head * self.dim_head)
         self.attention = Scaled_Dot_Product_Attention()
         # self.fc = nn.Linear(num_head * self.dim_head, dim_model)
-        self.dropout = nn.Dropout(dropout)
+        # self.dropout = nn.Dropout(dropout)
         self.layer_norm = nn.LayerNorm(dim_model)
 
     def forward(self, x, dialog_states):
@@ -195,7 +195,7 @@ class Multi_Head_Attention(nn.Module):
 
         context = context.view(batch_size, -1, self.dim_head * self.num_head)
         # out = self.fc(context)
-        out = self.dropout(context)
+        # out = self.dropout(context)
         out = out + x  # 残差连接
         out = self.layer_norm(out)
         return out
@@ -206,14 +206,14 @@ class Position_wise_Feed_Forward(nn.Module):
         super(Position_wise_Feed_Forward, self).__init__()
         self.fc1 = nn.Linear(dim_model, hidden)
         self.fc2 = nn.Linear(hidden, dim_model)
-        self.dropout = nn.Dropout(dropout)
+        # self.dropout = nn.Dropout(dropout)
         self.layer_norm = nn.LayerNorm(dim_model)
 
     def forward(self, x):
         out = self.fc1(x)
         out = F.relu(out)
         out = self.fc2(out)
-        out = self.dropout(out)
+        # out = self.dropout(out)
         out = out + x  # 残差连接
         out = self.layer_norm(out)
         return out
