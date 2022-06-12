@@ -87,7 +87,7 @@ class Context_Encoder(nn.Module):
 
         self.args        = args
         self.pad_size    = args.MAX_NUM_UTTR
-        # self.dropout     = args.drop_out
+        self.dropout     = args.drop_out
         self.num_head    = 1
         self.dim_model   = args.d_transformer
         self.num_encoder = 1
