@@ -48,7 +48,8 @@ model.eval()
 for batch in dataloader:
     batch     = tuple(t.cuda(args.device) for t in batch)
     with torch.no_grad():
-        outputs   = model(uttrs, attention_mask=uttr_masks)
+        b_uttrs, b_uttr_masks = batch
+        outputs   = model(b_uttrs, attention_mask=b_uttr_masks)
         logits    = outputs.logits
         logits    = logits.to('cpu').numpy()
         pred_flat = np.argmax(logits, axis=1).flatten()
