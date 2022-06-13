@@ -25,25 +25,41 @@ args.test_size     = 0.1
 
 
 
+from collections import Iterable
+
+def flatten_(items, ignore_types=(str, bytes)):
+    for x in items:
+        if isinstance(x, Iterable) and not isinstance(x, igore_types):
+            yield from flatten(x)
+        else:
+            yield x
+
+
+
 personalities = ['A']#,'C','E','O','N']
 
 
 tokenizer = AutoTokenizer.from_pretrained("tae898/emoberta-base")
 df = pd.read_csv('../data/Friends_'+personalities[0]+'_whole.tsv', sep='\t')
-
-uttrs      = [tokenizer.encode(sent, add_special_tokens=True, max_length=args.MAX_LEN, pad_to_max_length=True) for sent in df['utterance']]
-uttr_masks = [[float(i>0) for i in seq] for seq in uttrs]
-uttrs      = torch.tensor(uttrs)
-uttr_masks      = torch.tensor(uttr_masks)
-
-data = TensorDataset(uttrs, uttr_masks)
-sampler    = RandomSampler(data)
-dataloader = DataLoader(data, sampler=sampler, batch_size=args.batch_size, shuffle=False)
-
 model = AutoModelForSequenceClassification.from_pretrained("tae898/emoberta-base")
 
 
-pred_list = np.array([])
+
+# uttrs for the speaker
+
+uttrs      = [tokenizer.encode(sent, add_special_tokens=True, max_length=args.MAX_LEN, pad_to_max_length=True) for sent in df['utterance']]
+uttr_masks = [[float(i>0) for i in seq] for seq in uttrs]
+
+uttrs      = torch.tensor(uttrs)
+uttr_masks = torch.tensor(uttr_masks)
+
+data       = TensorDataset(uttrs, uttr_masks)
+sampler    = RandomSampler(data)
+dataloader = DataLoader(data, sampler=sampler, batch_size=args.batch_size, shuffle=False)
+
+
+
+uttr_pred_list = np.array([])
 model.eval()
 for batch in dataloader:
     batch     = tuple(t.cuda(args.device) for t in batch)
@@ -54,10 +70,42 @@ for batch in dataloader:
         logits    = logits.to('cpu').numpy()
         pred_flat = np.argmax(logits, axis=1).flatten()
         pred_list = np.append(pred_list, pred_flat)
-        print(pred_flat)
+
+print(uttr_pred_list)
+print('*'*10)
+
+### all sents
 
 
-print(pred_list)
+dialogues    = df['raw_text'].apply(lambda x: [i[1] for i in eval(x)])
+dialogs      = list(flatten_(dialogues))
+dialog_masks = [[float(i>0) for i in seq] for seq in uttrs]
+
+# dialogs       = [[tokenizer.encode(sent, add_special_tokens=True, max_length=args.MAX_LEN, pad_to_max_length=True) for sent in sents] for sents in dialogues]
+# dialog_masks  = [[[float(i>0) for i in seq] for seq in sents] for sents in dialogs]
+
+dialogs      = torch.tensor(dialogs)
+dialog_masks = torch.tensor(dialog_masks)
+
+
+data       = TensorDataset(dialogs, dialog_masks)
+sampler    = RandomSampler(data)
+dataloader = DataLoader(data, sampler=sampler, batch_size=args.batch_size, shuffle=False)
+
+dialogs_pred_list = np.array([])
+model.eval()
+for batch in dataloader:
+    batch     = tuple(t.cuda(args.device) for t in batch)
+    with torch.no_grad():
+        b_dialogs, b_dialog_masks = batch
+        outputs   = model(b_dialogs, attention_mask=b_dialog_masks)
+        logits    = outputs.logits
+        logits    = logits.to('cpu').numpy()
+        pred_flat = np.argmax(logits, axis=1).flatten()
+        pred_list = np.append(pred_list, pred_flat)
+
+print(dialogs_pred_list)
+
 
 
 
