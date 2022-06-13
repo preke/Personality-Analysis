@@ -49,6 +49,7 @@ for batch in dataloader:
     batch     = tuple(t.cuda(args.device) for t in batch)
     outputs   = model(uttrs, attention_mask=uttr_masks)
     logits    = outputs.logits
+    logits    = logits.to('cpu').numpy()
     pred_flat = np.argmax(logits, axis=1).flatten()
     pred_list = np.append(pred_list, pred_flat)
 
