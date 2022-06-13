@@ -49,19 +49,19 @@ sampler    = RandomSampler(data)
 dataloader = DataLoader(data, sampler=sampler, batch_size=args.batch_size, shuffle=False)
 
 
-
-uttr_pred_list = np.array([])
-model.eval()
-for batch in dataloader:
-    batch = tuple(t.cuda(args.device) for t in batch)
-    with torch.no_grad():
-        b_uttrs, b_uttr_masks = batch
-        outputs   = model(b_uttrs, attention_mask=b_uttr_masks)
-        logits    = outputs.logits
-        logits    = logits.to('cpu').numpy()
-        pred_flat = np.argmax(logits, axis=1).flatten()
-        uttr_pred_list = np.append(uttr_pred_list, pred_flat)
-
+with open('uttr_emo_labels.txt', 'w') as f:
+    uttr_pred_list = np.array([])
+    model.eval()
+    for batch in dataloader:
+        batch = tuple(t.cuda(args.device) for t in batch)
+        with torch.no_grad():
+            b_uttrs, b_uttr_masks = batch
+            outputs   = model(b_uttrs, attention_mask=b_uttr_masks)
+            logits    = outputs.logits
+            logits    = logits.to('cpu').numpy()
+            pred_flat = np.argmax(logits, axis=1).flatten()
+            uttr_pred_list = np.append(uttr_pred_list, pred_flat)
+    f.write(uttr_pred_list)
 print(uttr_pred_list)
 print('*'*10)
 
@@ -88,18 +88,19 @@ data       = TensorDataset(dialogs, dialog_masks)
 sampler    = RandomSampler(data)
 dataloader = DataLoader(data, sampler=sampler, batch_size=args.batch_size, shuffle=False)
 
-dialogs_pred_list = np.array([])
-model.eval()
-for batch in dataloader:
-    batch     = tuple(t.cuda(args.device) for t in batch)
-    with torch.no_grad():
-        b_dialogs, b_dialog_masks = batch
-        outputs   = model(b_dialogs, attention_mask=b_dialog_masks)
-        logits    = outputs.logits
-        logits    = logits.to('cpu').numpy()
-        pred_flat = np.argmax(logits, axis=1).flatten()
-        dialogs_pred_list = np.append(dialogs_pred_list, pred_flat)
-
+with open('dialog_emo_labels.txt', 'w') as f:
+    dialogs_pred_list = np.array([])
+    model.eval()
+    for batch in dataloader:
+        batch     = tuple(t.cuda(args.device) for t in batch)
+        with torch.no_grad():
+            b_dialogs, b_dialog_masks = batch
+            outputs   = model(b_dialogs, attention_mask=b_dialog_masks)
+            logits    = outputs.logits
+            logits    = logits.to('cpu').numpy()
+            pred_flat = np.argmax(logits, axis=1).flatten()
+            dialogs_pred_list = np.append(dialogs_pred_list, pred_flat)
+    f.write(dialog_pred_list)
 print(dialogs_pred_list)
 
 
