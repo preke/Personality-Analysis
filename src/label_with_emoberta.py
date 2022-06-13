@@ -25,15 +25,6 @@ args.test_size     = 0.1
 
 
 
-from collections import Iterable
-
-def flatten_(items, ignore_types=(str, bytes)):
-    for x in items:
-        if isinstance(x, Iterable) and not isinstance(x, igore_types):
-            yield from flatten(x)
-        else:
-            yield x
-
 
 
 personalities = ['A']#,'C','E','O','N']
@@ -78,7 +69,9 @@ print('*'*10)
 
 
 dialogues    = df['raw_text'].apply(lambda x: [i[1] for i in eval(x)])
-dialogs      = list(flatten_(dialogues))
+dialogs = []
+for sents in dialogues
+    dialogs += sents
 dialog_masks = [[float(i>0) for i in seq] for seq in uttrs]
 
 # dialogs       = [[tokenizer.encode(sent, add_special_tokens=True, max_length=args.MAX_LEN, pad_to_max_length=True) for sent in sents] for sents in dialogues]
