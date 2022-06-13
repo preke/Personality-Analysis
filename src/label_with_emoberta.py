@@ -7,6 +7,7 @@ import os
 import datetime
 import traceback
 from data_loader import load_data
+from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler,IterableDataset
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 
@@ -29,22 +30,33 @@ personalities = ['A']#,'C','E','O','N']
 
 tokenizer = AutoTokenizer.from_pretrained("tae898/emoberta-large")
 df = pd.read_csv('../data/Friends_'+personality+'_whole.tsv', sep='\t')
-uttrs = [tokenizer.encode(sent, add_special_tokens=True, max_length=args.MAX_LEN, pad_to_max_length=True) for sent in df['utterance']]
+
+uttrs      = [tokenizer.encode(sent, add_special_tokens=True, max_length=args.MAX_LEN, pad_to_max_length=True) for sent in df['utterance']]
 uttr_masks = [[float(i>0) for i in seq] for seq in uttrs]
+uttrs      = torch.tensor(uttrs)
+uttr_masks      = torch.tensor(uttr_masks)
+
+data = TensorDataset(uttrs, uttr_masks)
+sampler    = RandomSampler(data)
+dataloader = DataLoader(data, sampler=sampler, batch_size=args.batch_size, shuffle=False)
 
 model = AutoModelForSequenceClassification.from_pretrained("tae898/emoberta-large")
 
-def labeling(model, args, dataloader):
-    model.eval()
-    for batch in dataloader:
-        batch = tuple(t.cuda(args.device) for t in batch)
 
-        b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
-        logits = model(b_contexts, b_context_masks, b_dialog_states, b_vad_scores)
+pred_list = np.array([])
+model.eval()
+for batch in dataloader:
+    batch     = tuple(t.cuda(args.device) for t in batch)
+    outputs   = model(uttrs, attention_mask=uttr_masks)
+    logits    = outputs.logits
+    pred_flat = np.argmax(logits, axis=1).flatten()
+    pred_list = np.append(pred_list, pred_flat)
 
-        loss_ce             = nn.CrossEntropyLoss()
-        classification_loss = loss_ce(logits, b_labels)
-        loss                = classification_loss
+
+print(pred_list)
+
+
+
 
 
 
