@@ -29,7 +29,7 @@ personalities = ['A']#,'C','E','O','N']
 
 
 tokenizer = AutoTokenizer.from_pretrained("tae898/emoberta-large")
-df = pd.read_csv('../data/Friends_'+personality+'_whole.tsv', sep='\t')
+df = pd.read_csv('../data/Friends_'+personalities[0]+'_whole.tsv', sep='\t')
 
 uttrs      = [tokenizer.encode(sent, add_special_tokens=True, max_length=args.MAX_LEN, pad_to_max_length=True) for sent in df['utterance']]
 uttr_masks = [[float(i>0) for i in seq] for seq in uttrs]
