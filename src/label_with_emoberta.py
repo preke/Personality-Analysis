@@ -72,6 +72,8 @@ dialogues    = df['raw_text'].apply(lambda x: [i[1] for i in eval(x)])
 dialogs = []
 for sents in dialogues:
     dialogs += sents
+
+dialogs      = [tokenizer.encode(sent, add_special_tokens=True, max_length=args.MAX_LEN, pad_to_max_length=True) for sent in dialogs]
 dialog_masks = [[float(i>0) for i in seq] for seq in uttrs]
 
 # dialogs       = [[tokenizer.encode(sent, add_special_tokens=True, max_length=args.MAX_LEN, pad_to_max_length=True) for sent in sents] for sents in dialogues]
