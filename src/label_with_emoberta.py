@@ -53,6 +53,7 @@ for batch in dataloader:
         logits    = logits.to('cpu').numpy()
         pred_flat = np.argmax(logits, axis=1).flatten()
         pred_list = np.append(pred_list, pred_flat)
+        print(pred_flat)
 
 
 print(pred_list)
