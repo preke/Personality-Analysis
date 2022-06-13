@@ -100,7 +100,7 @@ with open('dialog_emo_labels.txt', 'w') as f:
             logits    = logits.to('cpu').numpy()
             pred_flat = np.argmax(logits, axis=1).flatten()
             dialogs_pred_list = np.append(dialogs_pred_list, pred_flat)
-    f.write(str(list(dialogs_pred_list.tostring)))
+    f.write(str(list(dialogs_pred_list)))
 print(dialogs_pred_list)
 
 
