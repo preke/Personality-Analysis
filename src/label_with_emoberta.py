@@ -41,7 +41,7 @@ personalities = ['A']#,'C','E','O','N']
 
 tokenizer = AutoTokenizer.from_pretrained("tae898/emoberta-base")
 df = pd.read_csv('../data/Friends_'+personalities[0]+'_whole.tsv', sep='\t')
-model = AutoModelForSequenceClassification.from_pretrained("tae898/emoberta-base")
+model = AutoModelForSequenceClassification.from_pretrained("tae898/emoberta-base").cuda(args.device)
 
 
 
@@ -65,8 +65,6 @@ for batch in dataloader:
     batch = tuple(t.cuda(args.device) for t in batch)
     with torch.no_grad():
         b_uttrs, b_uttr_masks = batch
-        print(b_uttrs)
-        print(b_uttr_masks)
         outputs   = model(b_uttrs, attention_mask=b_uttr_masks)
         logits    = outputs.logits
         logits    = logits.to('cpu').numpy()
