@@ -62,9 +62,11 @@ dataloader = DataLoader(data, sampler=sampler, batch_size=args.batch_size, shuff
 uttr_pred_list = np.array([])
 model.eval()
 for batch in dataloader:
-    batch     = tuple(t.cuda(args.device) for t in batch)
+    batch = tuple(t.cuda(args.device) for t in batch)
     with torch.no_grad():
         b_uttrs, b_uttr_masks = batch
+        print(b_uttrs)
+        print(b_uttr_masks)
         outputs   = model(b_uttrs, attention_mask=b_uttr_masks)
         logits    = outputs.logits
         logits    = logits.to('cpu').numpy()
