@@ -70,7 +70,7 @@ print('*'*10)
 
 dialogues    = df['raw_text'].apply(lambda x: [i[1] for i in eval(x)])
 dialogs = []
-for sents in dialogues
+for sents in dialogues:
     dialogs += sents
 dialog_masks = [[float(i>0) for i in seq] for seq in uttrs]
 
