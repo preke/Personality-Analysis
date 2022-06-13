@@ -69,7 +69,7 @@ for batch in dataloader:
         logits    = outputs.logits
         logits    = logits.to('cpu').numpy()
         pred_flat = np.argmax(logits, axis=1).flatten()
-        pred_list = np.append(pred_list, pred_flat)
+        uttr_pred_list = np.append(pred_list, pred_flat)
 
 print(uttr_pred_list)
 print('*'*10)
@@ -102,7 +102,7 @@ for batch in dataloader:
         logits    = outputs.logits
         logits    = logits.to('cpu').numpy()
         pred_flat = np.argmax(logits, axis=1).flatten()
-        pred_list = np.append(pred_list, pred_flat)
+        dialogs_pred_list = np.append(pred_list, pred_flat)
 
 print(dialogs_pred_list)
 
