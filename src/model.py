@@ -71,9 +71,11 @@ class Context_Encoder(nn.Module):
         semantic_out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * d_model
         semantic_out = self.position_embedding(semantic_out)
         ## add dialog state
-        semantic_out = self.dialog_state_embedding(semantic_out, dialog_states)
+        # semantic_out = self.dialog_state_embedding(semantic_out, dialog_states)
         semantic_out = self.semantic_encoder(semantic_out, dialog_states)
+        print(semantic_out.shape) ## batch_size * 
         semantic_out = torch.mean(semantic_out, 1)
+
 
         # Affective aspect:
         affective_out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * d_model

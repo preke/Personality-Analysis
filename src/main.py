@@ -30,7 +30,7 @@ args.d_transformer = 512
 
 
 args.mode         = 'Uttr' #'Context_Hierarchical_emoberta_uttr'
-args.BASE         = 'BERT'
+args.BASE         = 'RoBERTa'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 
@@ -53,12 +53,12 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-    epoch_list = [10]
-    lr_list = [1e-4]
+    epoch_list = [4]
+    lr_list = [2e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [10]
-    lr_list = [2e-4]
+    epoch_list = [4]
+    lr_list = [2e-5]
 
 args.lr = lr_list[0]
 

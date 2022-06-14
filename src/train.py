@@ -53,58 +53,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
             # Add batch to GPU
             batch = tuple(t.cuda(args.device) for t in batch)
             # Unpack the inputs from our dataloader
-            if args.mode == 'Ours':
-                b_uttrs, b_uttr_mask, b_dialog_ids, b_dialog_mask, b_seg_embeddings, b_vad_scores, b_labels = batch
-                # forward(self, uttr, uttr_mask, dialog, dialog_mask, dialog_seg_embeddings)
-                # print(b_uttrs)
-                # print(b_uttr_mask)
-                # print(b_dialog_ids)
-                # print(b_dialog_mask)
-                # print(b_seg_embeddings)
-                logits, logit_vad   = model(b_uttrs, b_uttr_mask, b_dialog_ids, b_dialog_mask, b_seg_embeddings)
-                loss_mse            = nn.MSELoss()
-                vad_loss            = loss_mse(logit_vad, b_vad_scores) 
-                loss_ce             = nn.CrossEntropyLoss()
-                classification_loss = loss_ce(logits, b_labels)
-                loss                = vad_loss + classification_loss
-
-            elif args.mode == 'Uttr_VAD_embedding':
-                b_uttr_vads, b_uttr_masks, b_labels = batch
-                logits  = model(b_uttr_vads, attention_mask=b_uttr_masks)
-                loss_ce = nn.CrossEntropyLoss()
-                loss    = loss_ce(logits, b_labels)
-
-            elif args.mode == 'Context_VAD_embedding':
-                b_sent_vads, b_sent_masks, b_seg_embeddings, b_labels = batch
-                logits  = model(b_sent_vads, attention_mask=b_sent_masks, segment_embeddings=b_seg_embeddings)
-                loss_ce = nn.CrossEntropyLoss()
-                loss    = loss_ce(logits, b_labels)
-                
-            elif args.mode == 'Context_VAD':
-                b_input_ids, b_input_mask, b_seg_embeddings, b_vad_scores, b_labels = batch
-                logits, logit_vad   = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask)
-                loss_mse            = nn.MSELoss()
-                vad_loss            = loss_mse(logit_vad, b_vad_scores) 
-                loss_ce             = nn.CrossEntropyLoss()
-                classification_loss = loss_ce(logits, b_labels)
-                loss                = vad_loss + classification_loss
-                
-            elif args.mode == 'Uttr_VAD':
-                b_input_ids, b_input_mask, b_vad_scores, b_labels = batch
-                logits, logit_vad   = model(b_input_ids, attention_mask=b_input_mask)
-                loss_mse            = nn.MSELoss()
-                vad_loss            = loss_mse(logit_vad, b_vad_scores)                  
-                loss_ce             = nn.CrossEntropyLoss()
-                classification_loss = loss_ce(logits, b_labels)
-                alpha = 1
-                loss                = alpha * vad_loss + (2 - alpha) * classification_loss
-            elif args.mode == 'Context' or args.mode == 'baseline_3.1':
-                b_input_ids, b_input_mask, b_vad_scores, b_labels = batch
-                b_seg_embeddings = b_vad_scores ## only in this case
-                outputs = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask, labels=b_labels)
-                loss    = outputs.loss
-                logits  = outputs.logits
-            elif args.mode == 'Context_Hierarchical':
+            if args.mode == 'Context_Hierarchical':
                 b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
                 # logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
                 logits = model(b_contexts, b_context_masks, b_dialog_states, b_vad_scores)
@@ -189,52 +138,7 @@ def eval_model(model, args, valid_dataloader):
         # Telling the model not to compute or store gradients, saving memory and speeding up validation
         model.eval()
         with torch.no_grad():
-            if args.mode == 'Ours':
-                b_uttrs, b_uttr_mask, b_dialog_ids, b_dialog_mask, b_seg_embeddings, b_vad_scores, b_labels = batch
-                # forward(self, uttr, uttr_mask, dialog, dialog_mask, token_type_ids)
-                logits, logit_vad   = model(b_uttrs, b_uttr_mask, b_dialog_ids, b_dialog_mask, b_seg_embeddings)
-                loss_mse            = nn.MSELoss()
-                vad_loss            = loss_mse(logit_vad, b_vad_scores) 
-                loss_ce             = nn.CrossEntropyLoss()
-                classification_loss = loss_ce(logits, b_labels)
-                loss                = vad_loss + classification_loss
-
-            elif args.mode == 'Uttr_VAD_embedding':
-                b_uttr_vads, b_uttr_masks, b_labels = batch
-                logits  = model(b_uttr_vads, attention_mask=b_uttr_masks)
-                loss_ce = nn.CrossEntropyLoss()
-                loss    = loss_ce(logits, b_labels)
-
-            elif args.mode == 'Context_VAD_embedding':
-                b_sent_vads, b_sent_masks, b_seg_embeddings, b_labels = batch
-                logits  = model(b_sent_vads, attention_mask=b_sent_masks, segment_embeddings=b_seg_embeddings)
-                loss_ce = nn.CrossEntropyLoss()
-                loss    = loss_ce(logits, b_labels)
-                
-            elif args.mode == 'Context_VAD':
-                b_input_ids, b_input_mask, b_seg_embeddings, b_vad_scores, b_labels = batch
-                logits, logit_vad   = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask)
-                loss_mse            = nn.MSELoss()
-                vad_loss            = loss_mse(logit_vad, b_vad_scores) 
-                loss_ce             = nn.CrossEntropyLoss()
-                classification_loss = loss_ce(logits, b_labels)
-                loss                = vad_loss + classification_loss
-            elif args.mode == 'Uttr_VAD':
-                b_input_ids, b_input_mask, b_vad_scores, b_labels = batch    
-                logits, logit_vad   = model(b_input_ids, attention_mask=b_input_mask)
-                loss_mse            = nn.MSELoss()
-                vad_loss            = loss_mse(logit_vad,b_vad_scores)                  
-                loss_ce             = nn.CrossEntropyLoss()
-                classification_loss = loss_ce(logits, b_labels)
-                loss                = vad_loss + classification_loss
-            elif args.mode == 'Context' or args.mode == 'baseline_3.1':
-                b_input_ids, b_input_mask, b_vad_scores, b_labels = batch    
-                b_seg_embeddings = b_vad_scores ## only in this case
-                outputs = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask, labels=b_labels)
-                loss    = outputs.loss
-                logits  = outputs.logits
-
-            elif args.mode == 'Context_Hierarchical':
+            if args.mode == 'Context_Hierarchical':
                 b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
                 # logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
                 logits = model(b_contexts, b_context_masks, b_dialog_states, b_vad_scores)
