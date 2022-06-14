@@ -7,11 +7,6 @@ import torch
 import copy
 import numpy as np
 
-
-
-
-    
-
 class Encoder(nn.Module):
     def __init__(self, dim_model, num_head, hidden):
         super(Encoder, self).__init__()
@@ -20,7 +15,6 @@ class Encoder(nn.Module):
     def forward(self, x, dialog_states):
         out = self.attention(x, dialog_states)
         return out
-
 
 class Dialog_State_Encoding(nn.Module):
     def __init__(self, embed, pad_size, device):
@@ -64,11 +58,9 @@ class Context_Encoder(nn.Module):
 
         self.position_embedding = Positional_Encoding(embed=self.dim_model, pad_size=self.pad_size, device=self.device)
         self.dialog_state_embedding = Dialog_State_Encoding(embed=self.dim_model, pad_size=self.pad_size, device=self.device)
-        self.encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden)
+        self.semantic_encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden)
+        self.affective_encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden)
         
-        # self.encoders = nn.ModuleList([
-        #     copy.deepcopy(self.encoder)
-        #     for _ in range(self.num_encoder)]) # num_encoder
 
         self.fc1 = nn.Linear(self.dim_model*2, self.num_classes)
         
@@ -80,9 +72,7 @@ class Context_Encoder(nn.Module):
         semantic_out = self.position_embedding(semantic_out)
         ## add dialog state
         semantic_out = self.dialog_state_embedding(semantic_out, dialog_states)
-        # for encoder in self.encoders:
-        #     semantic_out = encoder(semantic_out, dialog_states)
-        semantic_out = self.encoder(semantic_out, dialog_states)
+        semantic_out = self.semantic_encoder(semantic_out, dialog_states)
         semantic_out = torch.mean(semantic_out, 1)
 
         # Affective aspect:
@@ -90,9 +80,7 @@ class Context_Encoder(nn.Module):
         affective_out = self.position_embedding(affective_out)
         ## add dialog state
         affective_out = self.dialog_state_embedding(affective_out, dialog_states)
-        # for encoder in self.encoders:
-        #     affective_out = encoder(affective_out, dialog_states)
-        affective_out = self.encoder(affective_out, dialog_states)
+        affective_out = self.affective_encoder(affective_out, dialog_states)
         affective_out = torch.mean(affective_out, 1)
 
         out = torch.cat([semantic_out, affective_out], dim=1)
@@ -175,11 +163,11 @@ class DialogVAD(BertPreTrainedModel):
         self.config          = config
         self.bert            = BertModel(config)
         # self.get_vad         = nn.Linear(config.hidden_size, 3)  # 3 for vad
-        self.reduce_size     = nn.Linear(config.hidden_size, self.d_transformer) # from 768 reduce to 64 for the appended Transformer model
+        self.reduce_size     = nn.Linear(config.hidden_size, self.d_transformer) 
         self.vad_to_hidden = nn.Linear(3, self.d_transformer)
 
         self.context_encoder = Context_Encoder(args)
-        # self.personality_cls     = nn.Linear(config.hidden_size, 2) # binary classification
+        self.emo_cls     = nn.Linear(config.hidden_size, 7) 
         self.init_weights()
     
     def forward(self, context, context_mask, dialog_states, context_vad):  
@@ -187,11 +175,13 @@ class DialogVAD(BertPreTrainedModel):
         batch_size, max_ctx_len, max_utt_len = context.size() # 16 * 30 * 32
         
 
-        context_utts = context.view(max_ctx_len, batch_size, max_utt_len)    # [batch_size * dialog_length * max_uttr_length]122
+        context_utts = context.view(max_ctx_len, batch_size, max_utt_len)    
         context_mask = context_mask.view(max_ctx_len, batch_size, max_utt_len)   
 
         uttr_outputs  = [self.bert(uttr, uttr_mask) for uttr, uttr_mask in zip(context_utts,context_mask)]
-        uttr_outputs  = [self.reduce_size(uttr_output[1]) for uttr_output in uttr_outputs] # 30 * 16 * 768 
+
+
+        uttr_outputs  = [self.reduce_size(uttr_output[1]) for uttr_output in uttr_outputs] 
         uttr_embeddings = torch.stack(uttr_outputs) # 30 * 16 * 768
         uttr_embeddings = torch.autograd.Variable(uttr_embeddings.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
 
