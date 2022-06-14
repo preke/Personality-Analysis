@@ -17,7 +17,7 @@ from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaF
 parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
-args.device        = 0
+args.device        = 1
 args.MAX_LEN       = 128
 args.MAX_NUM_UTTR  = 40
 args.batch_size    = 32
@@ -126,11 +126,11 @@ with open(args.result_name, 'w') as f:
                 if args.BASE == 'BERT':
                     
                     bert_mode = 'Uttr'
-                    bert_lr = '1e-05'
+                    bert_lr = '2e-05'
                     bert_batch_size = '32'
                     
                     pre_trained_bert_path = './model/' + bert_mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
-                                + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed)  + '_with_attn_affective/'
+                                + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed)  + 'f1/'
                     
                     model = DialogVAD.from_pretrained(pre_trained_bert_path, args=args).cuda(args.device)
                 
