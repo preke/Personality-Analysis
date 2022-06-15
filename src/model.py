@@ -91,18 +91,20 @@ class Context_Encoder(nn.Module):
         dialog_states = torch.where(dialog_states<0, zero, dialog_states)
 
         speaker_length = torch.sum(dialog_states, dim=1)
-        # 32*40   32*1
-        print(dialog_states.shape)
-        print(speaker_length.shape)
-        print(speaker_length.unsqueeze(1).shape)
-        print(torch.div(dialog_states, speaker_length.unsqueeze(1)))
         
+       
+        dialog_states = torch.div(dialog_states, speaker_length.unsqueeze(1))
+        
+        semantic_out = semantic_out*dialog_states/speaker_length
+        
+        semantic_out = torch.mul(semantic_out, dialog_states.unsqueeze(2))
+        print(semantic_out.shape)
+        semantic_out = torch.sum(semantic_out, dim=1)
+        print(semantic_out.shape)
+        # semantic_out = torch.mean(semantic_out, 1)
         import time
         time.sleep(100)
-        semantic_out = semantic_out*dialog_states/speaker_length
-        torch.mul()
-        # semantic_out = torch.mean(semantic_out, 1)
-
+        
 
 
 
