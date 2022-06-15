@@ -29,9 +29,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
             param.requires_grad = True
             print(name,param.size())
     
-    # import time
-    # time.sleep(100)
-    
+   
     optimizer = AdamW(model.parameters(), lr=args.lr, eps=args.adam_epsilon, correct_bias=False)  # To reproduce BertAdam specific behavior set correct_bias=False
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_warmup_steps, num_training_steps=num_training_steps)  # PyTorch scheduler
     
@@ -53,7 +51,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
             # Add batch to GPU
             batch = tuple(t.cuda(args.device) for t in batch)
             # Unpack the inputs from our dataloader
-            if args.mode == 'Context_Hierarchical':
+            if args.mode == 'Context_Hierarchical' or 'Context_Hierarchical_emoberta_uttr':
                 b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
                 # logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
                 logits = model(b_contexts, b_context_masks, b_dialog_states, b_vad_scores)
@@ -138,7 +136,7 @@ def eval_model(model, args, valid_dataloader):
         # Telling the model not to compute or store gradients, saving memory and speeding up validation
         model.eval()
         with torch.no_grad():
-            if args.mode == 'Context_Hierarchical':
+            if args.mode == 'Context_Hierarchical' or 'Context_Hierarchical_emoberta_uttr':
                 b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
                 # logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
                 logits = model(b_contexts, b_context_masks, b_dialog_states, b_vad_scores)
@@ -170,12 +168,8 @@ def eval_model(model, args, valid_dataloader):
                 
         nb_eval_steps += 1
 
-    # print(classification_report(pred_list, labels_list, digits=4)
-    # print(logits)
-    # print(labels_list)
-    # print(pred_list)
+    
     return f1_score(labels_list, pred_list)
-    # return accuracy_score(labels_list, pred_list)
 
 
 

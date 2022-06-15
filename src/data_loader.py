@@ -22,11 +22,10 @@ emotions = {
 
 def get_vad(VAD_dict, sents, tokenizer, dialog_emo_label):
 
-    print(sents)
-    print(dialog_emo_label)
+    
+    dialog_vad = [emotions[i] for i in dialog_emo_label]
 
-    import time
-    time.sleep(100)
+    cnt = 0
     VAD_scores = []
     for sent in sents:
         w_list = re.sub(r'[^\w\s\[\]]','',tokenizer.decode(sent)).split()
@@ -43,6 +42,13 @@ def get_vad(VAD_dict, sents, tokenizer, dialog_emo_label):
         v_score /= float(len(w_list))
         a_score /= float(len(w_list))
         d_score /= float(len(w_list))
+        
+        v_score += dialog_vad[cnt][0]
+        a_score += dialog_vad[cnt][1]
+        d_score += dialog_vad[cnt][2]
+
+        cnt += 1
+
         VAD_scores.append([v_score, a_score, d_score])
     return VAD_scores
 
@@ -171,7 +177,6 @@ def load_data(df, args, tokenizer):
         labels         = list(df['labels'])
         
         dialog_emo_labels = df['Dialog_EmoBERTa_label']
-        print(dialog_emo_labels[0])
         
         uttr_vads     = [get_vad(args.VAD_dict, sent, tokenizer, dialog_emo_label) for sent, dialog_emo_label in zip(contexts, dialog_emo_labels)]
         

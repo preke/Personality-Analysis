@@ -46,15 +46,15 @@ for r in VAD_Lexicons.iterrows():
 args.VAD_dict = VAD_dict
 
 
-personalities = ['A','C', 'E', 'O','N']#
+personalities = ['A']
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-    epoch_list = [4]
-    lr_list = [1e-5]
+    epoch_list = [10]
+    lr_list = [1e-4]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [4]
