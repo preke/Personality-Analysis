@@ -22,7 +22,7 @@ emotions = {
 
 def get_vad(VAD_dict, sents, tokenizer, dialog_emo_label):
 
-    
+    print(dialog_emo_label)
     dialog_vad = [emotions[i] for i in dialog_emo_label]
 
     cnt = 0
