@@ -87,8 +87,8 @@ class Context_Encoder(nn.Module):
         
 
 
-
-        dialog_states = torch.where(a<0,zero,a)
+        print(dialog_states)
+        dialog_states = torch.where(dialog_states<0, zero, dialog_states)
         print(dialog_states)
         speaker_length = sum(dialog_states, 0) 
         print(speaker_length)
