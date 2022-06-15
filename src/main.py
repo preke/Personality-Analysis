@@ -30,7 +30,7 @@ args.d_transformer = 128
 
 
 args.mode         = 'Uttr' #Context_Hierarchical_emoberta_uttr' #_emoberta_uttr'
-args.BASE         = 'BERT'
+args.BASE         = 'RoBERTa'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 
@@ -58,7 +58,7 @@ if args.BASE == 'BERT':
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [4]
-    lr_list = [1e-5]
+    lr_list = [2e-5]
 
 args.lr = lr_list[0]
 
