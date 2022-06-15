@@ -118,7 +118,7 @@ with open(args.result_name, 'w') as f:
                 model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', \
                             num_labels=args.num_class).cuda(args.device)
 
-            elif args.mode == 'Context_Hierarchical':
+            elif args.mode == 'Context_Hierarchical' or 'Context_Hierarchical_emoberta_uttr':
                 '''
                 We first use BERT to encode each utterance in the first layer (also incorporate with a VAD regression model), 
                 and then in the second layer we model the context...
@@ -143,7 +143,7 @@ with open(args.result_name, 'w') as f:
                 model = BertForSequenceClassification.from_pretrained(args.model_path, \
                        num_labels=args.num_class).cuda(args.device)
             
-            elif args.mode == 'Context_Hierarchical':
+            elif args.mode == 'Context_Hierarchical' or 'Context_Hierarchical_emoberta_uttr':
                 if args.BASE == 'BERT':
                     model     = DialogVAD.from_pretrained(args.model_path, args=args).cuda(args.device)
                 elif args.BASE == 'RoBERTa':
