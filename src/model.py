@@ -94,8 +94,8 @@ class Context_Encoder(nn.Module):
         # 32*40   32*1
         print(dialog_states.shape)
         print(speaker_length.shape)
-        print(speaker_length.unsqueeze(0).shape)
-        print(torch.div(dialog_states, speaker_length.unsqueeze(0)))
+        print(speaker_length.unsqueeze(1).shape)
+        print(torch.div(dialog_states, speaker_length.unsqueeze(1)))
         
         import time
         time.sleep(100)
