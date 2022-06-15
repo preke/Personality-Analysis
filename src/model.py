@@ -92,8 +92,10 @@ class Context_Encoder(nn.Module):
         print(dialog_states)
         speaker_length = sum(dialog_states, 0) 
         print(speaker_length)
-        
+
         print(semantic_out*dialog_states/speaker_length)
+        import time
+        time.sleep(100)
         semantic_out = semantic_out*dialog_states/speaker_length
         # semantic_out = torch.mean(semantic_out, 1)
 
