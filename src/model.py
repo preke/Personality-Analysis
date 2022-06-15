@@ -67,23 +67,45 @@ class Context_Encoder(nn.Module):
     def forward(self, x, dialog_states, context_vad, d_transformer, args):
         
        
+        
+
         # Semantic Aspect:
         semantic_out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * d_model
         semantic_out = self.position_embedding(semantic_out)
         ## add dialog state
         # semantic_out = self.dialog_state_embedding(semantic_out, dialog_states)
         semantic_out = self.semantic_encoder(semantic_out, dialog_states)
-        print(semantic_out.shape) ## batch_size * 
-        semantic_out = torch.mean(semantic_out, 1)
+        
 
 
         # Affective aspect:
         affective_out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * d_model
         affective_out = self.position_embedding(affective_out)
         ## add dialog state
-        affective_out = self.dialog_state_embedding(affective_out, dialog_states)
+        # affective_out = self.dialog_state_embedding(affective_out, dialog_states)
         affective_out = self.affective_encoder(affective_out, dialog_states)
+        
+
+
+
+        dialog_states = torch.where(a<0,zero,a)
+        print(dialog_states)
+        speaker_length = sum(dialog_states, 0) 
+        print(speaker_length)
+        
+        print(semantic_out*dialog_states/speaker_length)
+        semantic_out = semantic_out*dialog_states/speaker_length
+        # semantic_out = torch.mean(semantic_out, 1)
+
+
+
+
         affective_out = torch.mean(affective_out, 1)
+
+
+
+
+
 
         out = torch.cat([semantic_out, affective_out], dim=1)
 
@@ -112,12 +134,7 @@ class Scaled_Dot_Product_Attention(nn.Module):
         mask = mask + 1
         attention = attention * scale
         attention = attention.masked_fill_(mask == 0, -1e9)
-        # attention = attention.masked_fill_(mask == 1, -1e9)
 
-
-        # print(attention)
-        # import time
-        # time.sleep(100)
 
         attention = F.softmax(attention, dim=-1)
         context = torch.matmul(attention, V)
