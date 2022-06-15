@@ -57,8 +57,8 @@ if args.BASE == 'BERT':
     lr_list = [1e-4]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [4]
-    lr_list = [1e-5]
+    epoch_list = [10]
+    lr_list = [1e-4]
 
 args.lr = lr_list[0]
 
@@ -103,9 +103,6 @@ with open(args.result_name, 'w') as f:
                 elif args.BASE == 'RoBERTa':
                     model = RobertaForSequenceClassification.from_pretrained('roberta-base', \
                                 num_labels=args.num_class).cuda(args.device)
-                elif args.BASE == 'EmoBERTa':
-                    model = AutoModelForSequenceClassification.from_pretrained("tae898/emoberta-base", \
-                        num_labels=args.num_class).cuda(args.device)
         
                
 
@@ -135,7 +132,15 @@ with open(args.result_name, 'w') as f:
                     model = DialogVAD.from_pretrained(pre_trained_bert_path, args=args).cuda(args.device)
                 
                 elif args.BASE == 'RoBERTa':
-                    model     = DialogVAD_roberta.from_pretrained('roberta-base').cuda(args.device)
+                    bert_mode = 'Uttr'
+                    bert_lr = '2e-05'
+                    bert_batch_size = '32'
+                    
+                    pre_trained_roberta_path = './model/' + bert_mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
+                                + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed)  + 'f1/'
+                    
+                    model = DialogVAD_roberta.from_pretrained(pre_trained_roberta_path, args=args).cuda(args.device)
+
 
             training_loss, best_eval_acc = train_model(model, args, train_dataloader, valid_dataloader, train_length)
             
@@ -147,7 +152,7 @@ with open(args.result_name, 'w') as f:
                 if args.BASE == 'BERT':
                     model     = DialogVAD.from_pretrained(args.model_path, args=args).cuda(args.device)
                 elif args.BASE == 'RoBERTa':
-                    model     = DialogVAD_roberta.from_pretrained(args.model_path).cuda(args.device)
+                    model     = DialogVAD_roberta.from_pretrained(args.model_path, args=args).cuda(args.device)
             
             else:
                 if args.BASE == 'BERT':

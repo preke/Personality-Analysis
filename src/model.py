@@ -160,7 +160,6 @@ class DialogVAD(BertPreTrainedModel):
         self.d_transformer   = args.d_transformer
         self.config          = config
         self.bert            = BertModel(config)
-        # self.get_vad         = nn.Linear(config.hidden_size, 3)  # 3 for vad
         self.reduce_size     = nn.Linear(config.hidden_size, self.d_transformer) 
         self.vad_to_hidden = nn.Linear(3, self.d_transformer)
 
@@ -195,64 +194,53 @@ class DialogVAD(BertPreTrainedModel):
         # ---- concat with transformer to do the self-attention
         logits = self.context_encoder(uttr_embeddings, dialog_states, context_vad, self.d_transformer, self.args) # [batch_size * 2]
 
-        return logits#, logit_vads
+        return logits
 
 
 
 class DialogVAD_roberta(RobertaPreTrainedModel):
     
-    def __init__(self, config):
+    def __init__(self, config, args):
         super().__init__(config)
-        self.num_labels      = 2
+        self.args            = args
+        self.num_labels      = args.num_class
+        self.d_transformer   = args.d_transformer
         self.config          = config
-        self.get_vad         = RobertaClassificationHead(config, num_labels=3)
-        self.roberta = RobertaModel(config, add_pooling_layer=True)
-        self.context_encoder = Context_Encoder(config)
-        self.personality_cls = RobertaClassificationHead(config, num_labels=self.num_labels)
+        self.roberta         = RobertaModel(config, add_pooling_layer=True)
+        self.reduce_size     = nn.Linear(config.hidden_size, self.d_transformer) 
+        self.vad_to_hidden = nn.Linear(3, self.d_transformer)
+
+        self.context_encoder = Context_Encoder(args)
+        self.emo_cls     = nn.Linear(config.hidden_size, 7) 
         self.init_weights()
     
-    def forward(self, context, utts_attn_mask, dialog_states):  
-
-        '''
-        context: [batchsize * dialog_length * max_uttr_length]
-        dialog_states: [batchsize * dialog_length] indicate if the current utterance is from the analyzed speaker 
-        '''
-
-        batch_size, max_ctx_len, max_utt_len = context.size()
-        # print(batch_size, max_ctx_len, max_utt_len)
-
-
-        utts = context.view(-1, max_utt_len)    # [batch_size * dialog_length * max_uttr_length]
-        utts_attn_mask = utts_attn_mask.view(-1, max_utt_len)    
+    def forward(self, context, context_mask, dialog_states, context_vad):  
         
-        # print(utts.shape)
-        # print(utts_attn_mask.shape)
+        batch_size, max_ctx_len, max_utt_len = context.size() # 16 * 30 * 32
         
-        uttr_outputs  = self.roberta(input_ids=utts, attention_mask=utts_attn_mask)
-        uttr_embedding = uttr_outputs[1]
-        # print(uttr_embedding.shape)
+
+        context_utts = context.view(max_ctx_len, batch_size, max_utt_len)    
+        context_mask = context_mask.view(max_ctx_len, batch_size, max_utt_len)   
+
+        uttr_outputs  = [self.roberta(uttr, uttr_mask) for uttr, uttr_mask in zip(context_utts,context_mask)]
+
+
+        uttr_outputs  = [self.reduce_size(uttr_output[1]) for uttr_output in uttr_outputs] 
+        uttr_embeddings = torch.stack(uttr_outputs) # 30 * 16 * 768
+        uttr_embeddings = torch.autograd.Variable(uttr_embeddings.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
+
+
+        context_vad = context_vad.view(max_ctx_len, batch_size, 3)
+        context_vad = [self.vad_to_hidden(uttr_vad) for uttr_vad in context_vad]
+        context_vad = torch.stack(context_vad)
+        context_vad = torch.autograd.Variable(context_vad.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
+
         
-        ## vad regression
-        logit_vads      = self.get_vad(uttr_embedding).view(-1, 10, 3) # [batch_size * dialog_length * 3]
-        # print(logit_vads.shape)
-        
+
 
         # ---- concat with transformer to do the self-attention
-        logits = self.context_encoder(uttr_embedding, dialog_states) # [batch_size * 2]
-        # print(logit.size())
+        logits = self.context_encoder(uttr_embeddings, dialog_states, context_vad, self.d_transformer, self.args) # [batch_size * 2]
 
-        return logits, logit_vads
+        return logits
 
-
-
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+    
