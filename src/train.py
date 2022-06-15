@@ -23,7 +23,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
     num_training_steps = len(train_dataloader)*args.epochs
     
     for name, param in model.named_parameters():        
-        if name.startswith('bert'):
+        if name.startswith('roberta'):
             param.requires_grad = False
         else:
             param.requires_grad = True

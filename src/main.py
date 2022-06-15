@@ -17,7 +17,7 @@ from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaF
 parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
-args.device        = 1
+args.device        = 0
 args.MAX_LEN       = 128
 args.MAX_NUM_UTTR  = 40
 args.batch_size    = 32
@@ -30,7 +30,7 @@ args.d_transformer = 128
 
 
 args.mode         = 'Context_Hierarchical_emoberta_uttr' #_emoberta_uttr'
-args.BASE         = 'BERT'
+args.BASE         = 'RoBERTa'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 
@@ -46,7 +46,7 @@ for r in VAD_Lexicons.iterrows():
 args.VAD_dict = VAD_dict
 
 
-personalities = ['N']
+personalities = ['A','C', 'E', 'O', 'N']
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
