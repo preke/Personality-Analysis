@@ -51,7 +51,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
             # Add batch to GPU
             batch = tuple(t.cuda(args.device) for t in batch)
             # Unpack the inputs from our dataloader
-            if args.mode == 'Context_Hierarchical' or 'Context_Hierarchical_emoberta_uttr':
+            if args.mode == 'Context_Hierarchical' or args.mode == 'Context_Hierarchical_emoberta_uttr':
                 b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
                 # logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
                 logits = model(b_contexts, b_context_masks, b_dialog_states, b_vad_scores)
@@ -136,7 +136,7 @@ def eval_model(model, args, valid_dataloader):
         # Telling the model not to compute or store gradients, saving memory and speeding up validation
         model.eval()
         with torch.no_grad():
-            if args.mode == 'Context_Hierarchical' or 'Context_Hierarchical_emoberta_uttr':
+            if args.mode == 'Context_Hierarchical' or args.mode == 'Context_Hierarchical_emoberta_uttr':
                 b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
                 # logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
                 logits = model(b_contexts, b_context_masks, b_dialog_states, b_vad_scores)
