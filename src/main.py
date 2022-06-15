@@ -30,7 +30,7 @@ args.d_transformer = 128
 
 
 args.mode         = 'Uttr' #Context_Hierarchical_emoberta_uttr' #_emoberta_uttr'
-args.BASE         = 'RoBERTa'
+args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 
