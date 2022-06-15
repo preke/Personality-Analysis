@@ -29,8 +29,8 @@ args.test_size     = 0.1
 args.d_transformer = 128
 
 
-args.mode         = 'Uttr' #Context_Hierarchical_emoberta_uttr' #_emoberta_uttr'
-args.BASE         = 'RoBERTa'
+args.mode         = 'Context_Hierarchical_emoberta_uttr' #_emoberta_uttr'
+args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 
@@ -53,8 +53,8 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-    epoch_list = [4]
-    lr_list = [1e-5]
+    epoch_list = [10]
+    lr_list = [1e-4]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [4]
@@ -86,8 +86,7 @@ with open(args.result_name, 'w') as f:
                                 + str(args.batch_size) + '_personality_' + personality + '_seed_' + str(seed) + 'f1/'
 
             train_dataloader, valid_dataloader, test_dataloader, train_length = load_data(df, args, tokenizer)
-
-            
+    
             if args.mode == 'Uttr':
                 '''
                 We use the pre-trained models to encode the utterance 
@@ -100,8 +99,6 @@ with open(args.result_name, 'w') as f:
                     model = RobertaForSequenceClassification.from_pretrained('roberta-base', \
                                 num_labels=args.num_class).cuda(args.device)
         
-               
-
             elif args.mode == 'Context':
                 '''
                 We input the whole dialog into the encoder for personality prediction. 
@@ -119,11 +116,11 @@ with open(args.result_name, 'w') as f:
                 if args.BASE == 'BERT':
                     
                     bert_mode = 'Uttr'
-                    bert_lr = '2e-05'
+                    bert_lr = '1e-05'
                     bert_batch_size = '32'
                     
                     pre_trained_bert_path = './model/' + bert_mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
-                                + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed)  + 'f1/'
+                                          + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed)  + 'f1/'
                     
                     model = DialogVAD.from_pretrained(pre_trained_bert_path, args=args).cuda(args.device)
                 
@@ -133,7 +130,7 @@ with open(args.result_name, 'w') as f:
                     bert_batch_size = '32'
                     
                     pre_trained_roberta_path = './model/' + bert_mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
-                                + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed)  + 'f1/'
+                                             + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed)  + 'f1/'
                     
                     model = DialogVAD_roberta.from_pretrained(pre_trained_roberta_path, args=args).cuda(args.device)
 
