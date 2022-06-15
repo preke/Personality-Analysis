@@ -8,29 +8,25 @@ import json
 import re
 
 
-# class Preprocessing:
-
-# def get_vad(VAD_dict, sents):
-#     VAD_scores = []
-#     for sent in sents:
-#         w_list = sent.split()
-#         v_score, a_score, d_score = [], [], []
-#         for word in w_list:
-#             try:
-#                 v_score.append(VAD_dict[word][0])
-#                 a_score.append(VAD_dict[word][1])
-#                 d_score.append(VAD_dict[word][2])
-#             except:
-#                 v_score.append(0)
-#                 a_score.append(0)
-#                 d_score.append(0)
-#         VAD_scores.append([v_score, a_score, d_score])
-        
-#     return VAD_scores
+# from EmoBERTa
+emotions = {
+    "neutral"  : [0.0, 0.0, 0.0], #0.0,
+    "joy"      : [0.76, 0.48, 0.35], #1.0,
+    "surprise" : [0.4, 0.67, -0.13], #2.0,
+    "anger"    : [-0.43, 0.67, 0.34], #3.0,
+    "sadness"  : [-0.63, 0.27, -0.33], #4.0,
+    "disgust"  : [-0.6, 0.35, 0.11], #5.0,
+    "fear"     : [-0.64, 0.6, -0.43]  #6.0
+}
 
 
+def get_vad(VAD_dict, sents, tokenizer, dialog_emo_label):
 
-def get_vad(VAD_dict, sents, tokenizer):
+    print(sents)
+    print(dialog_emo_label)
+
+    import time
+    time.sleep(100)
     VAD_scores = []
     for sent in sents:
         w_list = re.sub(r'[^\w\s\[\]]','',tokenizer.decode(sent)).split()
@@ -44,9 +40,9 @@ def get_vad(VAD_dict, sents, tokenizer):
                 v_score += 0
                 a_score += 0
                 d_score += 0
-        v_score/=float(len(w_list))
-        a_score/=float(len(w_list))
-        d_score/=float(len(w_list))
+        v_score /= float(len(w_list))
+        a_score /= float(len(w_list))
+        d_score /= float(len(w_list))
         VAD_scores.append([v_score, a_score, d_score])
     return VAD_scores
 
@@ -54,37 +50,8 @@ def get_VAD_tokenized_dict(i, VAD_tokenized_dict):
     try:
         return VAD_tokenized_dict[i]
     except:
-        return [0.0,0.0,0.0]
+        return [0.0, 0.0, 0.0]
 
-
-def get_seg_id(sent_list, role):
-    '''
-    Generate the segment id for the whole sent
-    '''
-    
-    ans = []
-    for i in eval(sent_list):
-        if i[0].split(' ')[0] != role:
-            
-            tmp = [0]*(len(i[1].split())+1)
-            ans += tmp
-        else:
-            tmp = [1]*(len(i[1].split())+1)
-            ans += tmp
-    return ans
-
-def get_sent(sent_list, role):
-    '''
-    Obtain the whole sent
-    '''
-    
-    ans = ""
-    for i in eval(sent_list):
-        if i[0].split(' ')[0] != role:
-            ans = ans + " " + i[1]
-        else:
-            ans = ans + " " + i[1]
-    return ans
 
 
 def padding_uttrs(contexts, padding_element, args):
@@ -202,7 +169,11 @@ def load_data(df, args, tokenizer):
 
         dialog_states  = [eval(i) for i in df['dialog_state']]
         labels         = list(df['labels'])
-        uttr_vads      = [get_vad(args.VAD_dict, sent, tokenizer) for sent in contexts]
+        
+        dialog_emo_labels = df['dialog_emo_labels']
+        print(dialog_emo_labels[0])
+        
+        uttr_vads     = [get_vad(args.VAD_dict, sent, tokenizer, dialog_emo_label) for sent, dialog_emo_label in zip(contexts, dialog_emo_labels)]
         
         contexts      = padding_uttrs(contexts, [0]*args.MAX_LEN, args) 
         context_masks = padding_uttrs(context_masks, [0]*args.MAX_LEN, args) 
@@ -210,7 +181,6 @@ def load_data(df, args, tokenizer):
         dialog_states = padding_uttrs(dialog_states, -1, args)
         uttr_vads     = padding_uttrs(uttr_vads, [0.0, 0.0, 0.0], args)
 
-        uttr_emo = df['dialog_emo_labels']
         
 
         train_contexts, test_contexts, train_labels, test_labels = \

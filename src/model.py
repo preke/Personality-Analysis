@@ -56,63 +56,36 @@ class Context_Encoder(nn.Module):
         self.device      = args.device
         self.hidden      = 512
 
-        self.position_embedding = Positional_Encoding(embed=self.dim_model, pad_size=self.pad_size, device=self.device)
+        self.position_embedding     = Positional_Encoding(embed=self.dim_model, pad_size=self.pad_size, device=self.device)
         self.dialog_state_embedding = Dialog_State_Encoding(embed=self.dim_model, pad_size=self.pad_size, device=self.device)
-        self.semantic_encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden)
-        self.affective_encoder = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden)
+        self.semantic_encoder       = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden)
+        self.affective_encoder      = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden)
         
 
         self.fc1 = nn.Linear(self.dim_model*2, self.num_classes)
         
     def forward(self, x, dialog_states, context_vad, d_transformer, args):
-        
-       
-        
-
         # Semantic Aspect:
-        semantic_out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * d_model
-        semantic_out = self.position_embedding(semantic_out)
-        ## add dialog state
-        # semantic_out = self.dialog_state_embedding(semantic_out, dialog_states)
-        semantic_out = self.semantic_encoder(semantic_out, dialog_states)
-        
-
+        semantic_out   = x.view(-1, self.pad_size, self.dim_model)
+        semantic_out   = self.position_embedding(semantic_out) 
+        semantic_out   = self.semantic_encoder(semantic_out, dialog_states)
 
         # Affective aspect:
-        affective_out = x.view(-1, self.pad_size, self.dim_model) # batch_size * context_len * d_model
-        affective_out = self.position_embedding(affective_out)
-        ## add dialog state
-        # affective_out = self.dialog_state_embedding(affective_out, dialog_states)
-        affective_out = self.affective_encoder(affective_out, dialog_states)
-        
+        affective_out  = x.view(-1, self.pad_size, self.dim_model)
+        affective_out  = self.position_embedding(affective_out)
+        affective_out  = self.affective_encoder(affective_out, dialog_states)
 
-
-        zero = torch.zeros_like(dialog_states)
-        dialog_states = torch.where(dialog_states<0, zero, dialog_states)
-
+        zero           = torch.zeros_like(dialog_states)
+        dialog_states  = torch.where(dialog_states<0, zero, dialog_states)
         speaker_length = torch.sum(dialog_states, dim=1)
+        dialog_states  = torch.div(dialog_states, speaker_length.unsqueeze(1))
         
-       
-        dialog_states = torch.div(dialog_states, speaker_length.unsqueeze(1))
+        semantic_out   = torch.mul(semantic_out, dialog_states.unsqueeze(2))
+        semantic_out   = torch.sum(semantic_out, dim=1)
         
-        semantic_out = torch.mul(semantic_out, dialog_states.unsqueeze(2))
-        print(semantic_out.shape)
-        semantic_out = torch.sum(semantic_out, dim=1)
-        print(semantic_out.shape)
-        # semantic_out = torch.mean(semantic_out, 1)
-        import time
-        time.sleep(100)
+        affective_out  = torch.mul(affective_out, dialog_states.unsqueeze(2))
+        affective_out  = torch.sum(affective_out, dim=1)
         
-
-
-
-        affective_out = torch.mean(affective_out, 1)
-
-
-
-
-
-
         out = torch.cat([semantic_out, affective_out], dim=1)
 
         out = self.fc1(out)
