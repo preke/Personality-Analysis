@@ -22,12 +22,12 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
     num_warmup_steps   = int(0*train_length) # first 1 epoch for warm-up
     num_training_steps = len(train_dataloader)*args.epochs
     
-    for name, param in model.named_parameters():        
-        if name.startswith('bert'):
-            param.requires_grad = False
-        else:
-            param.requires_grad = True
-            print(name,param.size())
+    # for name, param in model.named_parameters():        
+    #     if name.startswith('bert'):
+    #         param.requires_grad = False
+    #     else:
+    #         param.requires_grad = True
+    #         print(name,param.size())
     
    
     optimizer = AdamW(model.parameters(), lr=args.lr, eps=args.adam_epsilon, correct_bias=False)  # To reproduce BertAdam specific behavior set correct_bias=False
@@ -53,12 +53,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
             # Unpack the inputs from our dataloader
             if args.mode == 'Context_Hierarchical' or args.mode == 'Context_Hierarchical_emoberta_uttr':
                 b_contexts, b_context_masks, b_vad_scores, b_dialog_states, b_labels = batch
-                # logits, logit_vads = model(b_contexts, b_context_masks, b_dialog_states)
                 logits = model(b_contexts, b_context_masks, b_dialog_states, b_vad_scores)
-                
-                # loss_mse            = nn.MSELoss()
-                # vad_loss            = loss_mse(logit_vads, b_vad_scores)
-                
                 
                 loss_ce             = nn.CrossEntropyLoss()
                 classification_loss = loss_ce(logits, b_labels)
@@ -70,6 +65,12 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
             elif args.mode == 'Uttr':
                 b_input_ids, b_input_mask, b_labels = batch
                 outputs = model(b_input_ids, attention_mask=b_input_mask, labels=b_labels)
+                loss    = outputs.loss
+                logits  = outputs.logits
+            elif args.mode == 'Context':
+                b_input_ids, b_input_mask, b_vad_scores, b_labels = batch
+                b_seg_embeddings = b_vad_scores
+                outputs = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask, labels=b_labels)
                 loss    = outputs.loss
                 logits  = outputs.logits
             
@@ -154,6 +155,13 @@ def eval_model(model, args, valid_dataloader):
             elif args.mode == 'Uttr':
                 b_input_ids, b_input_mask, b_labels = batch
                 outputs = model(b_input_ids, attention_mask=b_input_mask, labels=b_labels)
+                logits  = outputs.logits
+
+            elif args.mode == 'Context':
+                b_input_ids, b_input_mask, b_vad_scores, b_labels = batch    
+                b_seg_embeddings = b_vad_scores ## only in this case
+                outputs = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask, labels=b_labels)
+                loss    = outputs.loss
                 logits  = outputs.logits
                 
         # Move logits and labels to CPU
