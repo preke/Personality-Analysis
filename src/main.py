@@ -105,8 +105,12 @@ with open(args.result_name, 'w') as f:
                 We indicated the utterance from the analyzed speaker and the context 
                 by segment embeddings in the pre-trained models: 1 for utterances and 0 for dialog context. 
                 '''
-                model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', \
-                            num_labels=args.num_class).cuda(args.device)
+                if args.BASE == 'BERT' :
+                    model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', \
+                               num_labels=args.num_class).cuda(args.device)
+                elif args.BASE == 'RoBERTa':
+                    model = RobertaForSequenceClassification.from_pretrained('roberta-base', \
+                                num_labels=args.num_class).cuda(args.device)
 
             elif args.mode == 'Context_Hierarchical' or args.mode == 'Context_Hierarchical_emoberta_uttr':
                 '''
