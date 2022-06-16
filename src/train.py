@@ -70,7 +70,8 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
             elif args.mode == 'Context':
                 b_input_ids, b_input_mask, b_vad_scores, b_labels = batch
                 b_seg_embeddings = b_vad_scores
-                outputs = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask, labels=b_labels)
+                # outputs = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask, labels=b_labels)
+                outputs = model(b_input_ids, attention_mask=b_input_mask, labels=b_labels)
                 loss    = outputs.loss
                 logits  = outputs.logits
             
@@ -160,7 +161,8 @@ def eval_model(model, args, valid_dataloader):
             elif args.mode == 'Context':
                 b_input_ids, b_input_mask, b_vad_scores, b_labels = batch    
                 b_seg_embeddings = b_vad_scores ## only in this case
-                outputs = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask, labels=b_labels)
+                # outputs = model(b_input_ids, token_type_ids=b_seg_embeddings, attention_mask=b_input_mask, labels=b_labels)
+                outputs = model(b_input_ids, attention_mask=b_input_mask, labels=b_labels)
                 loss    = outputs.loss
                 logits  = outputs.logits
                 
