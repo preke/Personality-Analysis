@@ -29,7 +29,7 @@ args.test_size     = 0.1
 args.d_transformer = 128
 
 
-args.mode         = 'Context'#_Hierarchical_emoberta_uttr' #_emoberta_uttr'
+args.mode         = 'Full_dialog' #_Hierarchical_emoberta_uttr' #_emoberta_uttr'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
@@ -87,19 +87,19 @@ with open(args.result_name, 'w') as f:
 
             train_dataloader, valid_dataloader, test_dataloader, train_length = load_data(df, args, tokenizer)
     
-            if args.mode == 'Uttr':
+            if args.mode == 'Uttr' or args.mode == 'Full_dialog':
                 '''
                 We use the pre-trained models to encode the utterance 
                 from the speakers for personality prediction through the classification head.
                 '''
-                if args.BASE == 'BERT':
+                if args.BASE == 'BERT' :
                     model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', \
                                num_labels=args.num_class).cuda(args.device)
                 elif args.BASE == 'RoBERTa':
                     model = RobertaForSequenceClassification.from_pretrained('roberta-base', \
                                 num_labels=args.num_class).cuda(args.device)
         
-            elif args.mode == 'Context':
+            elif args.mode == 'Context' :
                 '''
                 We input the whole dialog into the encoder for personality prediction. 
                 We indicated the utterance from the analyzed speaker and the context 

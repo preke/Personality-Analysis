@@ -376,3 +376,51 @@ def load_data(df, args, tokenizer):
         
         train_length     = len(train_data)
         return train_dataloader, valid_dataloader, test_dataloader, train_length
+
+    elif args.mode == 'Full_dialog':
+
+        dialogs = [tokenizer.encode(sent, add_special_tokens=True, max_length=args.MAX_LEN, \
+                pad_to_max_length=True) for sent in df['sent']]
+        dialog_masks = [[float(i>0) for i in seq] for seq in dialogs]
+        
+        labels = list(df['labels'])
+        
+        train_dialogs, test_dialogs, train_labels, test_labels = \
+            train_test_split(dialogs, labels, random_state=args.SEED, test_size=args.test_size, stratify=labels)
+        train_dialog_masks, test_dialog_masks,_,_ = train_test_split(dialog_masks,labels,random_state=args.SEED, \
+                                                       test_size=args.test_size,  stratify=labels)
+        
+        train_set_labels = train_labels
+        
+        train_dialogs, valid_dialogs, train_labels, valid_labels = \
+            train_test_split(train_dialogs, train_set_labels, random_state=args.SEED, test_size=args.test_size, stratify=train_set_labels)
+        train_dialog_masks, valid_dialog_masks,_,_ = train_test_split(train_dialog_masks, train_set_labels, random_state=args.SEED, \
+                                                       test_size=args.test_size,  stratify=train_set_labels)
+        
+        train_dialogs         = torch.tensor(train_dialogs)
+        valid_dialogs         = torch.tensor(valid_dialogs)
+        test_dialogs          = torch.tensor(test_dialogs)
+
+        train_dialog_masks    = torch.tensor(train_dialog_masks)
+        valid_dialog_masks    = torch.tensor(valid_dialog_masks)
+        test_dialog_masks     = torch.tensor(test_dialog_masks)
+        
+        train_labels        = torch.tensor(train_labels)    
+        valid_labels        = torch.tensor(valid_labels)
+        test_labels         = torch.tensor(test_labels)
+
+
+        train_data       = TensorDataset(train_dialogs, train_dialog_masks, train_labels)
+        train_sampler    = RandomSampler(train_data)
+        train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=args.batch_size)
+        
+        valid_data       = TensorDataset(valid_dialogs, valid_dialog_masks, valid_labels)
+        valid_sampler    = RandomSampler(valid_data)
+        valid_dataloader = DataLoader(valid_data, sampler=valid_sampler, batch_size=args.batch_size)
+        
+        test_data        = TensorDataset(test_dialogs, test_dialog_masks, test_labels)
+        test_sampler     = RandomSampler(test_data)
+        test_dataloader  = DataLoader(test_data, sampler=test_sampler, batch_size=args.batch_size)
+        
+        train_length     = len(train_data)
+        return train_dataloader, valid_dataloader, test_dataloader, train_length

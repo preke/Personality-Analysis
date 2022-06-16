@@ -62,7 +62,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
                 loss                = classification_loss # vad_loss + 
 
 
-            elif args.mode == 'Uttr':
+            elif args.mode == 'Uttr' or args.mode == 'Full_dialog':
                 b_input_ids, b_input_mask, b_labels = batch
                 outputs = model(b_input_ids, attention_mask=b_input_mask, labels=b_labels)
                 loss    = outputs.loss
@@ -153,7 +153,7 @@ def eval_model(model, args, valid_dataloader):
                 loss                = classification_loss
                 
                
-            elif args.mode == 'Uttr':
+            elif args.mode == 'Uttr' or args.mode == 'Full_dialog':
                 b_input_ids, b_input_mask, b_labels = batch
                 outputs = model(b_input_ids, attention_mask=b_input_mask, labels=b_labels)
                 logits  = outputs.logits
