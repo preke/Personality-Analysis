@@ -141,9 +141,13 @@ with open(args.result_name, 'w') as f:
 
             training_loss, best_eval_acc = train_model(model, args, train_dataloader, valid_dataloader, train_length)
             
-            if args.mode == 'Context' or args.mode == 'baseline_3.1':
-                model = BertForSequenceClassification.from_pretrained(args.model_path, \
-                       num_labels=args.num_class).cuda(args.device)
+            if args.mode == 'Context':
+                if args.BASE == 'BERT' :
+                    model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', \
+                               num_labels=args.num_class).cuda(args.device)
+                elif args.BASE == 'RoBERTa':
+                    model = RobertaForSequenceClassification.from_pretrained('roberta-base', \
+                                num_labels=args.num_class).cuda(args.device)
             
             elif args.mode == 'Context_Hierarchical' or args.mode == 'Context_Hierarchical_emoberta_uttr':
                 if args.BASE == 'BERT':
@@ -151,17 +155,7 @@ with open(args.result_name, 'w') as f:
                 elif args.BASE == 'RoBERTa':
                     model     = DialogVAD_roberta.from_pretrained(args.model_path, args=args).cuda(args.device)
             
-            else:
-                if args.BASE == 'BERT':
-                   model = BertForSequenceClassification.from_pretrained(args.model_path, \
-                       num_labels=args.num_class).cuda(args.device)
-                elif args.BASE == 'RoBERTa':
-                    model = RobertaForSequenceClassification.from_pretrained(args.model_path, \
-                            num_labels=args.num_class).cuda(args.device)
-                elif args.BASE == 'EmoBERTa':
-                    model = AutoModelForSequenceClassification.from_pretrained(args.model_path, num_labels=args.num_class).cuda(args.device)
-                
-                
+            
 
             print('Load model from', args.model_path)
             test_acc = eval_model(model, args, test_dataloader)
