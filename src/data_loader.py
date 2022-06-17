@@ -84,15 +84,13 @@ def load_data(df, args, tokenizer):
 
         dialog_states  = [eval(i) for i in df['dialog_state']]
         labels         = list(df['labels'])
-        uttr_vads      = [[]]# [get_vad(args.VAD_dict, sent, tokenizer) for sent in contexts]
         
-
 
         contexts      = padding_uttrs(contexts, [0]*args.MAX_LEN, args) # padding_element: [PAD]
         context_masks = padding_uttrs(context_masks, [0]*args.MAX_LEN, args) # padding_element: [PAD]
         
         dialog_states = padding_uttrs(dialog_states, -1, args)
-        uttr_vads     = padding_uttrs(uttr_vads, [0.0, 0.0, 0.0], args)
+        
 
 
         
@@ -106,8 +104,7 @@ def load_data(df, args, tokenizer):
         train_context_masks, test_context_masks,_,_ = train_test_split(context_masks,labels,random_state=args.SEED, \
                                                        test_size=args.test_size,  stratify=labels)
 
-        train_uttr_vads, test_uttr_vads,_,_ = train_test_split(uttr_vads, labels, random_state=args.SEED, \
-                                                       test_size=args.test_size,  stratify=labels)
+        
 
         train_dialog_states, test_dialog_states,_,_ = train_test_split(dialog_states, labels, random_state=args.SEED, \
                                                        test_size=args.test_size,  stratify=labels)
@@ -121,9 +118,7 @@ def load_data(df, args, tokenizer):
         train_context_masks, valid_context_masks,_,_ = train_test_split(train_context_masks, train_set_labels,random_state=args.SEED, \
                                                        test_size=args.test_size,  stratify=train_set_labels)
 
-        train_uttr_vads, valid_uttr_vads,_,_ = train_test_split(train_uttr_vads, train_set_labels, random_state=args.SEED, \
-                                                       test_size=args.test_size,  stratify=train_set_labels)
-
+       
         train_dialog_states, valid_dialog_states,_,_ = train_test_split(train_dialog_states, train_set_labels, random_state=args.SEED, \
                                                        test_size=args.test_size,  stratify=train_set_labels)
         
@@ -138,9 +133,9 @@ def load_data(df, args, tokenizer):
         valid_context_masks = torch.tensor(valid_context_masks) # [torch.tensor(i) for i in valid_context_masks]
         test_context_masks  = torch.tensor(test_context_masks)  #[torch.tensor(i) for i in test_context_masks]
         
-        train_uttr_vads      = torch.tensor(train_uttr_vads) # [torch.tensor(i) for i in train_uttr_vads]
-        valid_uttr_vads      = torch.tensor(valid_uttr_vads) # [torch.tensor(i) for i in valid_uttr_vads]
-        test_uttr_vads       = torch.tensor(test_uttr_vads)  # [torch.tensor(i) for i in test_uttr_vads]
+        train_uttr_vads      = torch.tensor([0]) 
+        valid_uttr_vads      = torch.tensor([0]) 
+        test_uttr_vads       = torch.tensor([0]) 
 
         train_dialog_states  = torch.tensor(train_dialog_states) # [torch.tensor(i) for i in train_dialog_states]
         valid_dialog_states  = torch.tensor(valid_dialog_states) # [torch.tensor(i) for i in valid_dialog_states]
