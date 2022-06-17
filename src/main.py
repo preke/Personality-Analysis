@@ -46,7 +46,7 @@ for r in VAD_Lexicons.iterrows():
 args.VAD_dict = VAD_dict
 
 
-personalities = ['E']#,'C','E','O','N']
+personalities = ['O']#,'C','E','O','N']
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
