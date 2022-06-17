@@ -83,8 +83,7 @@ with open(args.result_name, 'w') as f:
             torch.cuda.manual_seed_all(args.SEED)
 
             args.model_path  = './model/' + args.mode + '_' + str(args.MAX_LEN) + '_' + args.BASE + '_'+ str(args.lr) +'_' + '_batch_' \
-                                + str(args.batch_size) + '_personality_' + personality + '_seed_' + str(seed) +'_epoch_' + str(args.epochs) + '/'
-
+                                + str(args.batch_size) + '_personality_' + personality + '_seed_' + str(seed) +'_epoch_' + str(args.epochs)
             train_dataloader, valid_dataloader, test_dataloader, train_length = load_data(df, args, tokenizer)
     
             if args.mode == 'Uttr' or args.mode == 'Full_dialog':
