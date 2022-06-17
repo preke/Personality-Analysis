@@ -83,7 +83,8 @@ with open(args.result_name, 'w') as f:
             torch.cuda.manual_seed_all(args.SEED)
 
             args.model_path  = './model/' + args.mode + '_' + str(args.MAX_LEN) + '_' + args.BASE + '_'+ str(args.lr) +'_' + '_batch_' \
-                                + str(args.batch_size) + '_personality_' + personality + '_seed_' + str(seed) +'_epoch_' + str(args.epochs)
+                                + str(args.batch_size) + '_personality_' + personality + '_seed_' + str(seed) +'_epoch_' + str(args.epochs) + '/'
+
             train_dataloader, valid_dataloader, test_dataloader, train_length = load_data(df, args, tokenizer)
     
             if args.mode == 'Uttr' or args.mode == 'Full_dialog':
@@ -123,7 +124,7 @@ with open(args.result_name, 'w') as f:
                     bert_batch_size = '32'
                     bert_epochs = '3'
 
-                    pre_trained_bert_path = './model/' + bert_mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
+                    pre_trained_bert_path = './model/' + bert_mode + '_' + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
                                           + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed) + '_epoch_' + str(bert_epochs) + '/'
                     
                     model = DialogVAD.from_pretrained(pre_trained_bert_path, args=args).cuda(args.device)
