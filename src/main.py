@@ -64,7 +64,7 @@ args.lr = lr_list[0]
 
 cnt = 0
 
-seeds =  [0, 1, 41, 42, 123, 456, 789, 999, 1024, 2048] # 0
+seeds =  [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024] # 0
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
