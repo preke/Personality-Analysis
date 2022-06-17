@@ -165,11 +165,13 @@ with open(args.result_name, 'w') as f:
                                 num_labels=args.num_class).cuda(args.device)
             
             elif args.mode == 'Context_Hierarchical' or args.mode == 'Context_Hierarchical_affective':
-                if args.BASE == 'BERT':
-                    model     = DialogVAD.from_pretrained(args.model_path, args=args).cuda(args.device)
-                elif args.BASE == 'RoBERTa':
-                    model     = DialogVAD_roberta.from_pretrained(args.model_path, args=args).cuda(args.device)
-            
+                try:
+                    if args.BASE == 'BERT':
+                        model     = DialogVAD.from_pretrained(args.model_path, args=args).cuda(args.device)
+                    elif args.BASE == 'RoBERTa':
+                        model     = DialogVAD_roberta.from_pretrained(args.model_path, args=args).cuda(args.device)
+                except:
+                    print(traceback.print_exc())# load the origin model
             
 
             print('Load model from', args.model_path)
