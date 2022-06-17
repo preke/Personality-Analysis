@@ -46,7 +46,7 @@ for r in VAD_Lexicons.iterrows():
 args.VAD_dict = VAD_dict
 
 
-personalities = ['A','C','E','O','N']
+personalities = ['A']#,'C','E','O','N']
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -122,9 +122,10 @@ with open(args.result_name, 'w') as f:
                     bert_mode = 'Uttr'
                     bert_lr = '1e-05'
                     bert_batch_size = '32'
-                    
+                    bert_epochs = 3
+
                     pre_trained_bert_path = './model/' + bert_mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
-                                          + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed)  + 'f1/'
+                                          + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed) + '_epoch_' + str(bert_epochs) + '/'
                     
                     model = DialogVAD.from_pretrained(pre_trained_bert_path, args=args).cuda(args.device)
                 
