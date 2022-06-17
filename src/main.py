@@ -57,7 +57,7 @@ if args.BASE == 'BERT':
     lr_list = [1e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [4]
+    epoch_list = [3]
     lr_list = [1e-5]
 
 args.lr = lr_list[0]
@@ -83,7 +83,7 @@ with open(args.result_name, 'w') as f:
             torch.cuda.manual_seed_all(args.SEED)
 
             args.model_path  = './model/' + args.mode + '_' + str(args.MAX_LEN) + '_' + args.BASE + '_'+ str(args.lr) +'_' + '_batch_' \
-                                + str(args.batch_size) + '_personality_' + personality + '_seed_' + str(seed) + 'f1/'
+                                + str(args.batch_size) + '_personality_' + personality + '_seed_' + str(seed) +'_epoch_' + str(args.epochs) + '/'
 
             train_dataloader, valid_dataloader, test_dataloader, train_length = load_data(df, args, tokenizer)
     
@@ -161,7 +161,7 @@ with open(args.result_name, 'w') as f:
             test_acc = eval_model(model, args, test_dataloader)
             test_acc_all_seeds.append(test_acc)
             print('Current Seed is', seed)
-            print('Test acc:', test_acc)
+            print('Test F1:', test_acc)
             print('*'* 10, test_acc_total)
             print()
             

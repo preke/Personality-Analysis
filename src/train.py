@@ -106,7 +106,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
                             except:
                                 print(traceback.print_exc())
                 else:
-                    print('EVAL acc:', eval_acc, ' ', 'BEST_acc', best_eval_acc)
+                    print('EVAL F1:', eval_acc, ' ', 'BEST F1', best_eval_acc)
 
         # Calculate the average loss over the training data.
         avg_train_loss = batch_loss / len(train_dataloader)
