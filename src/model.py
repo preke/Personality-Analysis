@@ -59,10 +59,11 @@ class Context_Encoder(nn.Module):
         self.position_embedding     = Positional_Encoding(embed=self.dim_model, pad_size=self.pad_size, device=self.device)
         self.dialog_state_embedding = Dialog_State_Encoding(embed=self.dim_model, pad_size=self.pad_size, device=self.device)
         self.semantic_encoder       = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden)
-        self.affective_encoder      = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden)
-        
-
-        self.fc1 = nn.Linear(self.dim_model*2, self.num_classes)
+        if args.mode == 'Context_Hierarchical_affective':
+            self.affective_encoder      = Encoder(dim_model=self.dim_model, num_head=self.num_head, hidden=self.hidden)
+            self.fc1 = nn.Linear(self.dim_model*2, self.num_classes)
+        else:
+            self.fc1 = nn.Linear(self.dim_model, self.num_classes)
         
     def forward(self, x, dialog_states, context_vad, d_transformer, args):
         # Semantic Aspect:
@@ -70,10 +71,11 @@ class Context_Encoder(nn.Module):
         semantic_out   = self.position_embedding(semantic_out) 
         semantic_out   = self.semantic_encoder(semantic_out, dialog_states)
 
-        # Affective aspect:
-        affective_out  = x.view(-1, self.pad_size, self.dim_model)
-        affective_out  = self.position_embedding(affective_out)
-        affective_out  = self.affective_encoder(affective_out, dialog_states)
+        if args.mode == 'Context_Hierarchical_affective':
+            # Affective aspect:
+            affective_out  = x.view(-1, self.pad_size, self.dim_model)
+            affective_out  = self.position_embedding(affective_out)
+            affective_out  = self.affective_encoder(affective_out, dialog_states)
 
         zero           = torch.zeros_like(dialog_states)
         dialog_states  = torch.where(dialog_states<0, zero, dialog_states)
@@ -82,12 +84,13 @@ class Context_Encoder(nn.Module):
         
         semantic_out   = torch.mul(semantic_out, dialog_states.unsqueeze(2))
         semantic_out   = torch.sum(semantic_out, dim=1)
+        if args.mode == 'Context_Hierarchical_affective':
+            affective_out  = torch.mul(affective_out, dialog_states.unsqueeze(2))
+            affective_out  = torch.sum(affective_out, dim=1)
         
-        affective_out  = torch.mul(affective_out, dialog_states.unsqueeze(2))
-        affective_out  = torch.sum(affective_out, dim=1)
-        
-        out = torch.cat([semantic_out, affective_out], dim=1)
-
+            out = torch.cat([semantic_out, affective_out], dim=1)
+        else:
+            out = semantic_out
         out = self.fc1(out)
         return out
 
@@ -182,12 +185,13 @@ class DialogVAD(BertPreTrainedModel):
         uttr_embeddings = torch.stack(uttr_outputs) # 30 * 16 * 768
         uttr_embeddings = torch.autograd.Variable(uttr_embeddings.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
 
-
-        context_vad = context_vad.view(max_ctx_len, batch_size, 3)
-        context_vad = [self.vad_to_hidden(uttr_vad) for uttr_vad in context_vad]
-        context_vad = torch.stack(context_vad)
-        context_vad = torch.autograd.Variable(context_vad.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
-
+        if self.args.mode == 'Context_Hierarchical_affective':
+            context_vad = context_vad.view(max_ctx_len, batch_size, 3)
+            context_vad = [self.vad_to_hidden(uttr_vad) for uttr_vad in context_vad]
+            context_vad = torch.stack(context_vad)
+            context_vad = torch.autograd.Variable(context_vad.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
+        else:
+            context_vad = 0
         
 
 

@@ -29,8 +29,8 @@ args.test_size     = 0.1
 args.d_transformer = 128
 
 
-args.mode         = 'Full_dialog' #_Hierarchical_emoberta_uttr' #_emoberta_uttr'
-args.BASE         = 'RoBERTa'
+args.mode         = 'Context_Hierarchical' #_emoberta_uttr'
+args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 
@@ -112,7 +112,7 @@ with open(args.result_name, 'w') as f:
                     model = RobertaForSequenceClassification.from_pretrained('roberta-base', \
                                 num_labels=args.num_class).cuda(args.device)
 
-            elif args.mode == 'Context_Hierarchical' or args.mode == 'Context_Hierarchical_emoberta_uttr':
+            elif args.mode == 'Context_Hierarchical' or args.mode == 'Context_Hierarchical_affective':
                 '''
                 We first use BERT to encode each utterance in the first layer (also incorporate with a VAD regression model), 
                 and then in the second layer we model the context...
@@ -130,7 +130,7 @@ with open(args.result_name, 'w') as f:
                 
                 elif args.BASE == 'RoBERTa':
                     bert_mode = 'Uttr'
-                    bert_lr = '2e-05'
+                    bert_lr = '1e-05'
                     bert_batch_size = '32'
                     
                     pre_trained_roberta_path = './model/' + bert_mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \

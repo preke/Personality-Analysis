@@ -165,7 +165,7 @@ def load_data(df, args, tokenizer):
         train_length     = len(train_data)
         return train_dataloader, valid_dataloader, test_dataloader, train_length
 
-    elif args.mode == 'Context_Hierarchical_emoberta_uttr':
+    elif args.mode == 'Context_Hierarchical_affective':
         
         dialog_context = df['raw_text'].apply(lambda x: [i[1] for i in eval(x)])
 
