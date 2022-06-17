@@ -133,9 +133,10 @@ def load_data(df, args, tokenizer):
         valid_context_masks = torch.tensor(valid_context_masks) # [torch.tensor(i) for i in valid_context_masks]
         test_context_masks  = torch.tensor(test_context_masks)  #[torch.tensor(i) for i in test_context_masks]
         
-        train_uttr_vads      = torch.tensor([0]) 
-        valid_uttr_vads      = torch.tensor([0]) 
-        test_uttr_vads       = torch.tensor([0]) 
+        # only to aligh the dim
+        train_uttr_vads      = torch.tensor(train_labels)   
+        valid_uttr_vads      = torch.tensor(valid_labels) 
+        test_uttr_vads       = torch.tensor(test_labels) 
 
         train_dialog_states  = torch.tensor(train_dialog_states) # [torch.tensor(i) for i in train_dialog_states]
         valid_dialog_states  = torch.tensor(valid_dialog_states) # [torch.tensor(i) for i in valid_dialog_states]
