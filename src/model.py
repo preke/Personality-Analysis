@@ -85,8 +85,9 @@ class Context_Encoder(nn.Module):
         semantic_out   = torch.mul(semantic_out, dialog_states.unsqueeze(2))
         semantic_out   = torch.sum(semantic_out, dim=1)
         if args.mode == 'Context_Hierarchical_affective':
-            affective_out  = torch.mul(affective_out, dialog_states.unsqueeze(2))
-            affective_out  = torch.sum(affective_out, dim=1)
+            # affective_out  = torch.mul(affective_out, dialog_states.unsqueeze(2))
+            # affective_out  = torch.sum(affective_out, dim=1)
+            affective_out  = torch.mean(affective_out, dim=1)
         
             out = torch.cat([semantic_out, affective_out], dim=1)
         else:
