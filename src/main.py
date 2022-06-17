@@ -29,7 +29,7 @@ args.test_size     = 0.1
 args.d_transformer = 128
 
 
-args.mode         = 'Context_Hierarchical' #_emoberta_uttr'
+args.mode         = 'Uttr' #_emoberta_uttr'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
@@ -46,14 +46,14 @@ for r in VAD_Lexicons.iterrows():
 args.VAD_dict = VAD_dict
 
 
-personalities = ['N']#,'C','E','O','N']
+personalities = ['A','C','E','O','N']
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-    epoch_list = [4]
+    epoch_list = [3]
     lr_list = [1e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
@@ -64,7 +64,7 @@ args.lr = lr_list[0]
 
 cnt = 0
 
-seeds =  [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024] # 0
+seeds =  [0, 1, 41, 42, 123, 456, 789, 999, 1024, 2048] # 0
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
@@ -82,7 +82,7 @@ with open(args.result_name, 'w') as f:
             torch.manual_seed(args.SEED)
             torch.cuda.manual_seed_all(args.SEED)
 
-            args.model_path  = './model/' + args.mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ str(args.lr) +'_' + '_batch_' \
+            args.model_path  = './model/' + args.mode + '_' + str(args.MAX_LEN) + '_' + args.BASE + '_'+ str(args.lr) +'_' + '_batch_' \
                                 + str(args.batch_size) + '_personality_' + personality + '_seed_' + str(seed) + 'f1/'
 
             train_dataloader, valid_dataloader, test_dataloader, train_length = load_data(df, args, tokenizer)
