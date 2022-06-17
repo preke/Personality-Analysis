@@ -139,17 +139,31 @@ with open(args.result_name, 'w') as f:
                     model = DialogVAD_roberta.from_pretrained(pre_trained_roberta_path, args=args).cuda(args.device)
 
 
-            # training_loss, best_eval_acc = train_model(model, args, train_dataloader, valid_dataloader, train_length)
+            training_loss, best_eval_acc = train_model(model, args, train_dataloader, valid_dataloader, train_length)
             
-            if args.mode == 'Context':
+            
+            if args.mode == 'Uttr' or args.mode == 'Full_dialog':
+                '''
+                We use the pre-trained models to encode the utterance 
+                from the speakers for personality prediction through the classification head.
+                '''
                 if args.BASE == 'BERT' :
-                    model     = BertForSequenceClassification.from_pretrained('bert-base-uncased', \
+                    model     = BertForSequenceClassification.from_pretrained(args.model_path, \
                                num_labels=args.num_class).cuda(args.device)
                 elif args.BASE == 'RoBERTa':
-                    model = RobertaForSequenceClassification.from_pretrained('roberta-base', \
+                    model = RobertaForSequenceClassification.from_pretrained(args.model_path, \
+                                num_labels=args.num_class).cuda(args.device)
+
+
+            elif args.mode == 'Context':
+                if args.BASE == 'BERT' :
+                    model     = BertForSequenceClassification.from_pretrained(args.model_path, \
+                               num_labels=args.num_class).cuda(args.device)
+                elif args.BASE == 'RoBERTa':
+                    model = RobertaForSequenceClassification.from_pretrained(args.model_path, \
                                 num_labels=args.num_class).cuda(args.device)
             
-            elif args.mode == 'Context_Hierarchical' or args.mode == 'Context_Hierarchical_emoberta_uttr':
+            elif args.mode == 'Context_Hierarchical' or args.mode == 'Context_Hierarchical_affective':
                 if args.BASE == 'BERT':
                     model     = DialogVAD.from_pretrained(args.model_path, args=args).cuda(args.device)
                 elif args.BASE == 'RoBERTa':
