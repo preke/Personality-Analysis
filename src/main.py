@@ -24,7 +24,7 @@ args.batch_size    = 32
 args.adam_epsilon  = 1e-8
 # args.epochs        = 3
 args.num_class     = 2
-# args.drop_out      = 0.1
+args.drop_out      = 0.1
 args.test_size     = 0.1
 args.d_transformer = 128
 
@@ -54,7 +54,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
     epoch_list = [10]
-    lr_list = [1e-5]
+    lr_list = [2e-4]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [3]
