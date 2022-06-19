@@ -135,7 +135,7 @@ with open(args.result_name, 'w') as f:
                     bert_batch_size = '32'
                     bert_epochs = '4'
                     
-                    pre_trained_roberta_path = './model/' + bert_mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
+                    pre_trained_roberta_path = './model/' + bert_mode + '_' + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
                                              + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed)  + '_epoch_' + str(bert_epochs) + '/'
                     
                     model = DialogVAD_roberta.from_pretrained(pre_trained_roberta_path, args=args).cuda(args.device)
