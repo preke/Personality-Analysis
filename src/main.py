@@ -29,7 +29,7 @@ args.test_size     = 0.1
 args.d_transformer = 128
 
 
-args.mode         = 'Full_dialog' #'Uttr'#Full_dialog' #_emoberta_uttr'
+args.mode         = 'Context_Hierarchical_affective' #'Uttr'#Full_dialog' #_emoberta_uttr'
 args.BASE         = 'RoBERTa'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
@@ -57,7 +57,7 @@ if args.BASE == 'BERT':
     lr_list = [2e-4]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [14]
+    epoch_list = [10]
     lr_list = [1e-4]
 
 args.lr = lr_list[0]
@@ -131,11 +131,11 @@ with open(args.result_name, 'w') as f:
                 
                 elif args.BASE == 'RoBERTa':
                     bert_mode = 'Uttr'
-                    bert_lr = '1e-05'
+                    bert_lr = '0.0001'
                     bert_batch_size = '32'
                     
                     pre_trained_roberta_path = './model/' + bert_mode + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
-                                             + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed)  + 'f1/'
+                                             + bert_batch_size + '_personality_' + personality + '_seed_' + str(seed)  + '_epoch_' + str(bert_epochs) + '/'
                     
                     model = DialogVAD_roberta.from_pretrained(pre_trained_roberta_path, args=args).cuda(args.device)
 
