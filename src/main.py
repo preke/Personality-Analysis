@@ -120,7 +120,7 @@ with open(args.result_name, 'w') as f:
                 if args.BASE == 'BERT':
                     
                     bert_mode = 'Uttr'
-                    bert_lr = '1e-04'
+                    bert_lr = '0.0001'
                     bert_batch_size = '32'
                     bert_epochs = '4'
 
