@@ -17,7 +17,7 @@ from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaF
 parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
-args.device        = 1
+args.device        = 0
 args.MAX_LEN       = 128
 args.MAX_NUM_UTTR  = 40
 args.batch_size    = 32
@@ -58,7 +58,7 @@ if args.BASE == 'BERT':
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [14]
-    lr_list = [1e-5]
+    lr_list = [1e-4]
 
 args.lr = lr_list[0]
 
