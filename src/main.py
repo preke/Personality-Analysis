@@ -17,7 +17,7 @@ from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaF
 parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
-args.device        = 1
+args.device        = 0
 args.MAX_LEN       = 128
 args.MAX_NUM_UTTR  = 40
 args.batch_size    = 32
@@ -29,8 +29,8 @@ args.test_size     = 0.1
 args.d_transformer = 128
 
 
-args.mode         = 'Context_Hierarchical_affective' #'Uttr'#Full_dialog' #_emoberta_uttr'
-args.BASE         = 'BERT'
+args.mode         = 'Uttr' #'Uttr'#Full_dialog' #_emoberta_uttr'
+args.BASE         = 'RoBERTa'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 
@@ -57,7 +57,7 @@ if args.BASE == 'BERT':
     lr_list = [1e-4]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [3]
+    epoch_list = [14]
     lr_list = [1e-5]
 
 args.lr = lr_list[0]
