@@ -141,7 +141,7 @@ with open(args.result_name, 'w') as f:
                     model = DialogVAD_roberta.from_pretrained(pre_trained_roberta_path, args=args).cuda(args.device)
 
 
-            # training_loss, best_eval_acc = train_model(model, args, train_dataloader, valid_dataloader, train_length)
+            training_loss, best_eval_acc = train_model(model, args, train_dataloader, valid_dataloader, train_length)
             
             
             if args.mode == 'Uttr' or args.mode == 'Full_dialog':
