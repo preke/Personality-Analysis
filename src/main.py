@@ -29,8 +29,8 @@ args.test_size     = 0.1
 args.d_transformer = 128
 
 
-args.mode         = 'Context_Hierarchical_affective' #'Uttr'#Full_dialog' #_emoberta_uttr'
-args.BASE         = 'BERT'
+args.mode         = 'Uttr' #'Uttr'#Full_dialog' #_emoberta_uttr'
+args.BASE         = 'RoBERTa'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 
@@ -141,7 +141,7 @@ with open(args.result_name, 'w') as f:
                     model = DialogVAD_roberta.from_pretrained(pre_trained_roberta_path, args=args).cuda(args.device)
 
 
-            training_loss, best_eval_acc = train_model(model, args, train_dataloader, valid_dataloader, train_length)
+            # training_loss, best_eval_acc = train_model(model, args, train_dataloader, valid_dataloader, train_length)
             
             
             if args.mode == 'Uttr' or args.mode == 'Full_dialog':
