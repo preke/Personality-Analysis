@@ -54,10 +54,10 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
     epoch_list = [10]
-    lr_list = [2e-4]
+    lr_list = [5e-4]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [10]
+    epoch_list = [4]
     lr_list = [1e-4]
 
 args.lr = lr_list[0]
@@ -141,7 +141,7 @@ with open(args.result_name, 'w') as f:
                     model = DialogVAD_roberta.from_pretrained(pre_trained_roberta_path, args=args).cuda(args.device)
 
 
-            training_loss, best_eval_acc = train_model(model, args, train_dataloader, valid_dataloader, train_length)
+            # training_loss, best_eval_acc = train_model(model, args, train_dataloader, valid_dataloader, train_length)
             
             
             if args.mode == 'Uttr' or args.mode == 'Full_dialog':
