@@ -31,7 +31,7 @@ args.d_transformer = 128
 
 # args.mode         = 'Full_dialog'
 # args.mode         = 'Uttr'
-args.mode         = 'Context_Hierarchical_affective'
+args.mode         = 'Context_Hierarchical'
 args.BASE         = 'RoBERTa'
 # args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
