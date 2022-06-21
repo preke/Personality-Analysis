@@ -68,7 +68,7 @@ cnt = 0
 seeds =  [321, 1024, 0, 1, 13, 41, 42, 123, 456, 999]
 
 if args.data == 'Friends_Persona':
-    personalities = ['A', 'C', 'E', 'O', 'N']
+    personalities = ['C', 'E', 'N'] #['A', 'C', 'E', 'O', 'N']
     args.batch_size = 32
 else:
     personalities = ['Joey','Rachel','Monica','Phoebe','Ross'] # 'Chandler',
