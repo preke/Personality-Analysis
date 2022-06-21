@@ -137,7 +137,7 @@ with open(args.result_name, 'w') as f:
                 if args.BASE == 'BERT':
                     
                     bert_mode = 'Uttr'
-                    bert_lr = '5e-5'
+                    bert_lr = '5e-05'
                     bert_batch_size = '64'
                     bert_epochs = '4'
 
