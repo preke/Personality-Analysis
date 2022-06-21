@@ -17,7 +17,7 @@ from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaF
 parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
-args.device        = 0
+args.device        = 1
 args.MAX_LEN       = 128
 args.MAX_NUM_UTTR  = 40
 args.batch_size    = 32
@@ -29,11 +29,11 @@ args.test_size     = 0.1
 args.d_transformer = 128
 
 
-args.mode         = 'Context_Hierarchical_affective' #'Uttr'#Full_dialog' #_emoberta_uttr'
+args.mode         = 'Uttr' #'Uttr'#Full_dialog' #_emoberta_uttr'
 args.BASE         = 'RoBERTa'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
-
+args.data = 'PELD' # 'Friends_Persona'
 
 
 
@@ -46,15 +46,15 @@ for r in VAD_Lexicons.iterrows():
 args.VAD_dict = VAD_dict
 
 
-personalities = ['A', 'C', 'E', 'O', 'N']
+
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-    epoch_list = [10]
-    lr_list = [2e-4]
+    epoch_list = [4]
+    lr_list = [1e-4]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [10]
@@ -66,13 +66,21 @@ cnt = 0
 
 seeds =  [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024] # 0
 
+if args.data == 'Friends_Persona':
+    personalities = ['A', 'C', 'E', 'O', 'N']
+else:
+    personalities = ['Chandler' 'Joey' 'Rachel' 'Monica' 'Phoebe' 'Ross']
+
 with open(args.result_name, 'w') as f:
     test_acc_total = []
     for personality in personalities:
         args.lr = lr_list[0]#[cnt]
         args.epochs = epoch_list[0]#[cnt]
         cnt += 1
-        df = pd.read_csv('../data/Friends_'+personality+'_whole.tsv', sep='\t')
+        if args.data == 'Friends_Persona':
+            df = pd.read_csv('../data/Friends_'+personality+'_whole.tsv', sep='\t')
+        else:
+            df = pd.read_csv('../data/PELD_'+personality+'.tsv', sep='\t')
         print('Current training classifier for', personality, '...')
 
         test_acc_all_seeds = []

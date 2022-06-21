@@ -172,7 +172,10 @@ def load_data(df, args, tokenizer):
         dialog_states  = [eval(i) for i in df['dialog_state']]
         labels         = list(df['labels'])
         
-        dialog_emo_labels = df['Dialog_EmoBERTa_label']
+        try:
+            dialog_emo_labels = df['Dialog_EmoBERTa_label']
+        except:
+            dialog_emo_labels = df['emo_label']
         
         uttr_vads     = [get_vad(args.VAD_dict, sent, tokenizer, dialog_emo_label) for sent, dialog_emo_label in zip(contexts, dialog_emo_labels)]
         
