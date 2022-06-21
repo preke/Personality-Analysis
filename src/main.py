@@ -29,8 +29,8 @@ args.test_size     = 0.1
 args.d_transformer = 128
 
 
-args.mode         = 'Context_Hierarchical' #'Uttr'#Full_dialog' #_emoberta_uttr'
-args.BASE         = 'BERT'
+args.mode         = 'Context_Hierarchical_affective' #'Uttr'#Full_dialog' #_emoberta_uttr'
+args.BASE         = 'RoBERTa'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 
@@ -46,7 +46,7 @@ for r in VAD_Lexicons.iterrows():
 args.VAD_dict = VAD_dict
 
 
-personalities = ['A', 'C', 'E','O','N']
+personalities = ['A', 'C', 'E', 'O', 'N']
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -57,8 +57,8 @@ if args.BASE == 'BERT':
     lr_list = [2e-4]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [1]
-    lr_list = [1e-4]
+    epoch_list = [10]
+    lr_list = [5e-4]
 
 args.lr = lr_list[0]
 
