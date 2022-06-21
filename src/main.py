@@ -29,11 +29,11 @@ args.test_size     = 0.1
 args.d_transformer = 128
 
 
-args.mode         = 'Full_dialog' #'Uttr'#Full_dialog' #_emoberta_uttr'
-args.BASE         = 'RoBERTa'
+args.mode         = 'Uttr' #'Uttr'#Full_dialog' #_emoberta_uttr'
+args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
-args.data = 'Friends_Persona' # 'Friends_Persona'
+args.data = 'PELD'#'Friends_Persona' # 'Friends_Persona'
 
 
 
@@ -71,7 +71,7 @@ if args.data == 'Friends_Persona':
     personalities = ['A', 'C', 'E', 'O', 'N']
     args.batch_size    = 32
 else:
-    personalities = ['Chandler']#,'Joey','Rachel','Monica','Phoebe','Ross']
+    personalities = ['Joey','Rachel','Monica','Phoebe','Ross'] # 'Chandler',
     args.batch_size    = 64
 
 with open(args.result_name, 'w') as f:
