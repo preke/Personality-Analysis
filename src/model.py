@@ -234,12 +234,14 @@ class DialogVAD_roberta(RobertaPreTrainedModel):
         uttr_embeddings = torch.stack(uttr_outputs) # 30 * 16 * 768
         uttr_embeddings = torch.autograd.Variable(uttr_embeddings.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
 
-
-        context_vad = context_vad.view(max_ctx_len, batch_size, 3)
-        context_vad = [self.vad_to_hidden(uttr_vad) for uttr_vad in context_vad]
-        context_vad = torch.stack(context_vad)
-        context_vad = torch.autograd.Variable(context_vad.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
-
+        if self.args.mode == 'Context_Hierarchical_affective':
+            context_vad = context_vad.view(max_ctx_len, batch_size, 3)
+            context_vad = [self.vad_to_hidden(uttr_vad) for uttr_vad in context_vad]
+            context_vad = torch.stack(context_vad)
+            context_vad = torch.autograd.Variable(context_vad.view(batch_size, max_ctx_len, self.d_transformer), requires_grad=True)
+        else:
+            context_vad = 0
+        
         
 
 
