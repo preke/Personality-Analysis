@@ -29,8 +29,8 @@ args.test_size     = 0.1
 args.d_transformer = 128
 
 
-args.mode         = 'Full_dialog'
-# args.mode         = 'Uttr'
+# args.mode         = 'Full_dialog'
+args.mode         = 'Uttr'
 # args.mode         = 'Context'
 args.BASE         = 'RoBERTa'
 # args.BASE         = 'BERT'
@@ -72,7 +72,7 @@ cnt = 0
 seeds =  [321, 1024, 0, 1, 13, 41, 42, 123, 456, 999]
 
 if args.data == 'Friends_Persona':
-    personalities = ['A', 'O'] #['A', 'C', 'E', 'O', 'N']
+    personalities = ['A', 'C', 'E', 'O', 'N']
     args.batch_size = 32
     args.MAX_NUM_UTTR  = 40
 else:
