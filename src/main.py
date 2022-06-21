@@ -71,6 +71,8 @@ if args.data == 'Friends_Persona':
 else:
     personalities = ['Chandler']#,'Joey','Rachel','Monica','Phoebe','Ross']
 
+    # Chandler: 2e-5 4: [[0.4523809523809524, 0.22222222222222224, 0.4285714285714285, 0.3850931677018633, 0.41916167664670656, 0.42774566473988446, 0.27972027972027974, 0.35227272727272724, 0.2222222222222222, 0.36250000000000004]]
+
 with open(args.result_name, 'w') as f:
     test_acc_total = []
     for personality in personalities:
