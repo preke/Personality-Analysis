@@ -30,8 +30,8 @@ args.d_transformer = 128
 
 
 # args.mode         = 'Full_dialog'
-args.mode         = 'Uttr'
-# args.mode         = 'Context'
+# args.mode         = 'Uttr'
+args.mode         = 'Context'
 args.BASE         = 'RoBERTa'
 # args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
