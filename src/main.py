@@ -69,7 +69,7 @@ seeds =  [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024] # 0
 if args.data == 'Friends_Persona':
     personalities = ['A', 'C', 'E', 'O', 'N']
 else:
-    personalities = ['Chandler','Joey','Rachel','Monica','Phoebe','Ross']
+    personalities = ['Chandler']#,'Joey','Rachel','Monica','Phoebe','Ross']
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
