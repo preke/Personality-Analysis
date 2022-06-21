@@ -17,9 +17,9 @@ from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaF
 parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
-args.device        = 0
+args.device        = 1
 args.MAX_LEN       = 128
-args.MAX_NUM_UTTR  = 40
+
 
 args.adam_epsilon  = 1e-8
 # args.epochs        = 3
@@ -30,10 +30,10 @@ args.d_transformer = 128
 
 
 args.mode         = 'Full_dialog' #'Uttr'#Full_dialog' #_emoberta_uttr'
-args.BASE         = 'RoBERTa'
+args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
-args.data = 'Friends_Persona' # 'Friends_Persona'
+args.data = 'PELD' #'Friends_Persona' # 'Friends_Persona'
 
 
 
@@ -54,7 +54,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-    epoch_list = [4]
+    epoch_list = [14]
     lr_list = [5e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
@@ -70,9 +70,11 @@ seeds =  [321, 1024, 0, 1, 13, 41, 42, 123, 456, 999]
 if args.data == 'Friends_Persona':
     personalities = ['C', 'E', 'N'] #['A', 'C', 'E', 'O', 'N']
     args.batch_size = 32
+    args.MAX_NUM_UTTR  = 40
 else:
-    personalities = ['Joey','Rachel','Monica','Phoebe','Ross'] # 'Chandler',
+    personalities = ['Chandler', 'Joey','Rachel','Monica','Phoebe','Ross'] # ,
     args.batch_size    = 64
+    args.MAX_NUM_UTTR  = 10
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
