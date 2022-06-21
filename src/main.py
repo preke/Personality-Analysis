@@ -30,7 +30,7 @@ args.d_transformer = 128
 
 
 args.mode         = 'Full_dialog' #'Uttr'#Full_dialog' #_emoberta_uttr'
-args.BASE         = 'Roberta'
+args.BASE         = 'RoBERTa'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 args.data = 'Friends_Persona' # 'Friends_Persona'
