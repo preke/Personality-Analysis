@@ -17,10 +17,10 @@ from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaF
 parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
-args.device        = 1
+args.device        = 0
 args.MAX_LEN       = 128
 args.MAX_NUM_UTTR  = 40
-args.batch_size    = 64
+
 args.adam_epsilon  = 1e-8
 # args.epochs        = 3
 args.num_class     = 2
@@ -29,11 +29,12 @@ args.test_size     = 0.1
 args.d_transformer = 128
 
 
-args.mode         = 'Uttr' #'Uttr'#Full_dialog' #_emoberta_uttr'
-args.BASE         = 'BERT'
+args.mode         = 'Full_dialog' #'Uttr'#Full_dialog' #_emoberta_uttr'
+args.BASE         = 'Roberta'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
-args.data = 'PELD' # 'Friends_Persona'
+args.data = 'Friends_Persona' # 'Friends_Persona'
+
 
 
 
@@ -57,8 +58,8 @@ if args.BASE == 'BERT':
     lr_list = [5e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [10]
-    lr_list = [5e-4]
+    epoch_list = [14]
+    lr_list = [2e-4]
 
 args.lr = lr_list[0]
 
@@ -68,10 +69,10 @@ seeds =  [0, 1, 13, 41, 42, 123, 456, 321, 999, 1024] # 0
 
 if args.data == 'Friends_Persona':
     personalities = ['A', 'C', 'E', 'O', 'N']
+    args.batch_size    = 32
 else:
     personalities = ['Chandler']#,'Joey','Rachel','Monica','Phoebe','Ross']
-
-    # Chandler: 2e-5 4: [[0.4523809523809524, 0.22222222222222224, 0.4285714285714285, 0.3850931677018633, 0.41916167664670656, 0.42774566473988446, 0.27972027972027974, 0.35227272727272724, 0.2222222222222222, 0.36250000000000004]]
+    args.batch_size    = 64
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
