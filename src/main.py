@@ -17,7 +17,7 @@ from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaF
 parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
-args.device        = 1
+args.device        = 0
 args.MAX_LEN       = 128
 
 
@@ -30,8 +30,8 @@ args.d_transformer = 128
 
 
 # args.mode         = 'Full_dialog'
-args.mode         = 'Uttr'
-args.mode         = 'Context_Hierarchical_affective'
+# args.mode         = 'Uttr'
+args.mode         = 'Context'#_Hierarchical_affective'
 # args.BASE         = 'RoBERTa'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
