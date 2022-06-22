@@ -29,11 +29,11 @@ args.test_size     = 0.1
 args.d_transformer = 128 # 256
 
 
-args.mode         = 'Full_dialog'
-# args.mode         = 'Uttr'
+# args.mode         = 'Full_dialog'
+args.mode         = 'Uttr'
 # args.mode         = 'Context'#_Hierarchical_affective'
 # args.BASE         = 'RoBERTa'
-args.BASE         = 'BERT'
+args.BASE         = 'RoBERTa'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 # args.data = 'Friends_Persona'
