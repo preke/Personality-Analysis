@@ -31,7 +31,7 @@ args.d_transformer = 128 # 256
 
 args.mode         = 'Full_dialog'
 # args.mode         = 'Uttr'
-args.mode         = 'Context'#_Hierarchical_affective'
+# args.mode         = 'Context'#_Hierarchical_affective'
 # args.BASE         = 'RoBERTa'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
@@ -62,7 +62,7 @@ if args.BASE == 'BERT':
     lr_list = [5e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [10]
+    epoch_list = [4]
     lr_list = [1e-4]
 
 args.lr = lr_list[0]
