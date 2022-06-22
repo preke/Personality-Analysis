@@ -36,7 +36,7 @@ args.mode         = 'Context'#_Hierarchical_affective'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
-args.data = 'Friends_Persona'
+# args.data = 'Friends_Persona'
 args.data = 'PELD'
 
 
@@ -59,7 +59,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
     epoch_list = [8]
-    lr_list = [1e-5]
+    lr_list = [5e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [10]
