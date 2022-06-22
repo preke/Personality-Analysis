@@ -26,10 +26,10 @@ args.adam_epsilon  = 1e-8
 args.num_class     = 2
 args.drop_out      = 0.1
 args.test_size     = 0.1
-args.d_transformer = 128
+args.d_transformer = 128 # 256
 
 
-# args.mode         = 'Full_dialog'
+args.mode         = 'Full_dialog'
 # args.mode         = 'Uttr'
 args.mode         = 'Context'#_Hierarchical_affective'
 # args.BASE         = 'RoBERTa'
