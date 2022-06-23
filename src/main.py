@@ -69,7 +69,7 @@ args.lr = lr_list[0]
 
 cnt = 0
 
-seeds =  [1024, 0, 1, 13, 41, 42, 123, 456, 999]
+seeds =  [42, 1024, 0, 1, 13, 41, 123, 456, 999] # 321
 
 if args.data == 'Friends_Persona':
     personalities = ['A', 'C', 'E', 'O', 'N']
