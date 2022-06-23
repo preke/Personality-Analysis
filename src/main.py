@@ -63,13 +63,13 @@ if args.BASE == 'BERT':
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [4]
-    lr_list = [2e-3]
+    lr_list = [2e-4]
 
 args.lr = lr_list[0]
 
 cnt = 0
 
-seeds =  [321, 1024, 0, 1, 13, 41, 42, 123, 456, 999]
+seeds =  [1024, 0, 1, 13, 41, 42, 123, 456, 999]
 
 if args.data == 'Friends_Persona':
     personalities = ['A', 'C', 'E', 'O', 'N']
