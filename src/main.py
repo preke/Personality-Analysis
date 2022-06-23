@@ -62,8 +62,8 @@ if args.BASE == 'BERT':
     lr_list = [5e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [8]
-    lr_list = [2e-4]
+    epoch_list = [4]
+    lr_list = [2e-3]
 
 args.lr = lr_list[0]
 
@@ -77,7 +77,7 @@ if args.data == 'Friends_Persona':
     args.MAX_NUM_UTTR  = 40
 else:
     personalities = ['Chandler', 'Joey','Rachel','Monica','Phoebe','Ross'] # ,
-    args.batch_size    = 16
+    args.batch_size    = 64
     args.MAX_NUM_UTTR  = 10
 
 with open(args.result_name, 'w') as f:
