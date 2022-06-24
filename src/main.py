@@ -17,7 +17,7 @@ from transformers import RobertaConfig, RobertaModel, RobertaTokenizer, RobertaF
 parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
-args.device        = 1
+args.device        = 0
 args.MAX_LEN       = 128
 
 
@@ -77,8 +77,8 @@ if args.data == 'Friends_Persona':
     args.MAX_NUM_UTTR  = 40
 else:
     # personalities = ['Chandler', 'Joey','Rachel','Monica','Phoebe','Ross']
-    # personalities = ['Monica','Phoebe','Ross'] # 0
-    personalities = ['Chandler', 'Joey','Rachel'] # 1
+    personalities = ['Monica','Phoebe','Ross'] # 0
+    # personalities = ['Chandler', 'Joey','Rachel'] # 1
     args.batch_size    = 64
     args.MAX_NUM_UTTR  = 10
 
