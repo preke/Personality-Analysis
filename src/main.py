@@ -78,7 +78,7 @@ if args.data == 'Friends_Persona':
 else:
     # personalities = ['Chandler', 'Joey','Rachel','Monica','Phoebe','Ross']
     personalities = ['Monica','Phoebe','Ross'] # 0
-    personalities = ['Chandler', 'Joey','Rachel'] # 1
+    # personalities = ['Chandler', 'Joey','Rachel'] # 1
     args.batch_size    = 64
     args.MAX_NUM_UTTR  = 10
 
