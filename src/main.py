@@ -77,7 +77,7 @@ if args.data == 'Friends_Persona':
     args.MAX_NUM_UTTR  = 40
 else:
     personalities = ['Chandler', 'Joey','Rachel','Monica','Phoebe','Ross'] # ,
-    args.batch_size    = 256
+    args.batch_size    = 128
     args.MAX_NUM_UTTR  = 3
 
 with open(args.result_name, 'w') as f:
