@@ -77,8 +77,8 @@ if args.data == 'Friends_Persona':
     args.MAX_NUM_UTTR  = 40
 else:
     personalities = ['Chandler', 'Joey','Rachel','Monica','Phoebe','Ross'] # ,
-    args.batch_size    = 64
-    args.MAX_NUM_UTTR  = 10
+    args.batch_size    = 256
+    args.MAX_NUM_UTTR  = 3
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
