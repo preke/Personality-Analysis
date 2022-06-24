@@ -80,7 +80,7 @@ else:
     personalities = ['Monica','Phoebe','Ross'] # 0
     # personalities = ['Chandler', 'Joey','Rachel'] # 1
     args.batch_size    = 64
-    args.MAX_NUM_UTTR  = 10
+    args.MAX_NUM_UTTR  = 4
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
