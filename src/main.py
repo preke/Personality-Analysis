@@ -26,14 +26,14 @@ args.adam_epsilon  = 1e-8
 args.num_class     = 2
 args.drop_out      = 0.1
 args.test_size     = 0.1
-args.d_transformer = 128 # 256
+args.d_transformer = 256 # 128
 
 
 # args.mode         = 'Full_dialog'
 # args.mode         = 'Uttr'
-args.mode         = 'Context_Hierarchical_affective'
-# args.BASE         = 'RoBERTa'
-args.BASE         = 'BERT'
+args.mode         = 'Context'#_Hierarchical_affective'
+args.BASE         = 'RoBERTa'
+args.BASE   。      = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
 args.result_name  = args.mode + '.txt' 
 # args.data = 'Friends_Persona'
@@ -62,7 +62,7 @@ if args.BASE == 'BERT':
     lr_list = [1e-4]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [4]
+    epoch_list = [8]
     lr_list = [5e-5]
 
 args.lr = lr_list[0]
