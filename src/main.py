@@ -149,7 +149,7 @@ with open(args.result_name, 'w') as f:
                 elif args.BASE == 'RoBERTa':
                     bert_mode = 'Uttr'
                     bert_lr = '0.01'
-                    bert_batch_size = '64'
+                    bert_batch_size = '128'
                     bert_epochs = '4'
                     
                     pre_trained_roberta_path = './model/' + bert_mode + '_' + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
