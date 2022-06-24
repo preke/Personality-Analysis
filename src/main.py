@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser(description='')
 args   = parser.parse_args()
 
 args.device        = 0
-args.MAX_LEN       = 128
+args.MAX_LEN       = 256
 
 
 args.adam_epsilon  = 1e-6
@@ -77,8 +77,8 @@ if args.data == 'Friends_Persona':
     args.MAX_NUM_UTTR  = 40
 else:
     personalities = ['Chandler', 'Joey','Rachel','Monica','Phoebe','Ross'] # ,
-    args.batch_size    = 128
-    args.MAX_NUM_UTTR  = 3
+    args.batch_size    = 64
+    args.MAX_NUM_UTTR  = 4
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
