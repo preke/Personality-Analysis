@@ -21,7 +21,7 @@ args.device        = 0
 args.MAX_LEN       = 128
 
 
-args.adam_epsilon  = 1e-8
+args.adam_epsilon  = 1e-6
 # args.epochs        = 3
 args.num_class     = 2
 args.drop_out      = 0.1
@@ -62,8 +62,8 @@ if args.BASE == 'BERT':
     lr_list = [1e-4]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
-    epoch_list = [8]
-    lr_list = [5e-5]
+    epoch_list = [4]
+    lr_list = [1e-5]
 
 args.lr = lr_list[0]
 
