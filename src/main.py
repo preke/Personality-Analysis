@@ -30,8 +30,8 @@ args.d_transformer = 256 # 128
 
 
 # args.mode         = 'Full_dialog'
-args.mode         = 'Uttr'
-# args.mode         = 'Context_Hierarchical_affective'
+# args.mode         = 'Uttr'
+args.mode         = 'Context_Hierarchical_affective'
 # args.BASE         = 'RoBERTa'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
@@ -58,8 +58,8 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-    epoch_list = [8]
-    lr_list = [1e-4]
+    epoch_list = [4]
+    lr_list = [5e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     epoch_list = [4]
@@ -76,9 +76,11 @@ if args.data == 'Friends_Persona':
     args.batch_size = 32
     args.MAX_NUM_UTTR  = 40
 else:
-    personalities = ['Chandler', 'Joey','Rachel','Monica','Phoebe','Ross'] # ,
-    args.batch_size    = 128
-    args.MAX_NUM_UTTR  = 4
+    # personalities = ['Chandler', 'Joey','Rachel','Monica','Phoebe','Ross']
+    personalities = ['Monica','Phoebe','Ross'] # 0
+    personalities = ['Chandler', 'Joey','Rachel'] # 1
+    args.batch_size    = 64
+    args.MAX_NUM_UTTR  = 10
 
 with open(args.result_name, 'w') as f:
     test_acc_total = []
