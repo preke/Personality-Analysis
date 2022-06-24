@@ -22,7 +22,7 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
     if args.data == 'Friends_Persona':
         num_warmup_steps = int(0*train_length)
     else:
-        num_warmup_steps   = int(0.5*train_length)
+        num_warmup_steps   = int(0*train_length)
     num_training_steps = len(train_dataloader)*args.epochs
     
     # if args.BASE == 'BERT':
