@@ -30,8 +30,8 @@ args.d_transformer = 256 # 128
 
 
 # args.mode         = 'Full_dialog'
-args.mode         = 'Uttr'
-# args.mode         = 'Context'#_Hierarchical_affective'
+# args.mode         = 'Uttr'
+args.mode         = 'Context'#_Hierarchical_affective'
 args.BASE         = 'RoBERTa'
 # args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
@@ -148,8 +148,8 @@ with open(args.result_name, 'w') as f:
                 
                 elif args.BASE == 'RoBERTa':
                     bert_mode = 'Uttr'
-                    bert_lr = '0.0001'
-                    bert_batch_size = '32'
+                    bert_lr = '0.01'
+                    bert_batch_size = '64'
                     bert_epochs = '4'
                     
                     pre_trained_roberta_path = './model/' + bert_mode + '_' + str(args.MAX_LEN) + '_' + args.BASE + '_'+ bert_lr +'_' + '_batch_' \
