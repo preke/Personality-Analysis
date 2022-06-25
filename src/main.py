@@ -58,7 +58,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 if args.BASE == 'BERT':
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-    epoch_list = [4]
+    epoch_list = [12]
     lr_list = [5e-5]
 elif args.BASE == 'RoBERTa':
     tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
