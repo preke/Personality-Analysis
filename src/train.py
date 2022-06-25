@@ -22,20 +22,20 @@ def train_model(model, args, train_dataloader, valid_dataloader, train_length):
     if args.data == 'Friends_Persona':
         num_warmup_steps = int(0*train_length)
     else:
-        num_warmup_steps   = int(0*train_length)
+        num_warmup_steps   = int(0.05*train_length)
     num_training_steps = len(train_dataloader)*args.epochs
     
-    if args.BASE == 'BERT':
-        base_encoding_layer = 'bert'
-    elif args.BASE == 'RoBERTa':
-        base_encoding_layer = 'roberta'
+    # if args.BASE == 'BERT':
+    #     base_encoding_layer = 'bert'
+    # elif args.BASE == 'RoBERTa':
+    #     base_encoding_layer = 'roberta'
 
-    for name, param in model.named_parameters():        
-        if name.startswith(base_encoding_layer):
-            param.requires_grad = False
-        else:
-            param.requires_grad = True
-            print(name,param.size())
+    # for name, param in model.named_parameters():        
+    #     if name.startswith(base_encoding_layer):
+    #         param.requires_grad = False
+    #     else:
+    #         param.requires_grad = True
+    #         print(name,param.size())
     
    
     optimizer = AdamW(model.parameters(), lr=args.lr, eps=args.adam_epsilon, correct_bias=False)  # To reproduce BertAdam specific behavior set correct_bias=False

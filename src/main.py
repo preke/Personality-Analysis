@@ -30,8 +30,8 @@ args.d_transformer = 256 # 128
 
 
 # args.mode         = 'Full_dialog'
-# args.mode         = 'Uttr'
-args.mode         = 'Context_Hierarchical_affective'
+args.mode         = 'Uttr'
+# args.mode         = 'Context_Hierarchical_affective'
 # args.BASE         = 'RoBERTa'
 args.BASE         = 'BERT'
 args.VAD_tokenized_dict = '../VAD_tokenized_dict.json'
@@ -76,8 +76,8 @@ if args.data == 'Friends_Persona':
     args.batch_size = 32
     args.MAX_NUM_UTTR  = 40
 else:
-    # personalities = ['Chandler', 'Joey','Rachel','Monica','Phoebe','Ross']
-    personalities = ['Monica','Phoebe','Ross'] # 0
+    personalities = ['Chandler', 'Joey','Rachel','Monica','Phoebe','Ross']
+    # personalities = ['Monica','Phoebe','Ross'] # 0
     # personalities = ['Chandler', 'Joey','Rachel'] # 1
     args.batch_size    = 64
     args.MAX_NUM_UTTR  = 10
